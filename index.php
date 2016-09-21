@@ -87,7 +87,7 @@
 	  </span>
 	  
 	  <span class='coutputformatxml cinitiallyhidden cfurtheroption' >
-		<input type='checkbox' id='ioutputxmlelements' class='cinput1' name='outputXMLElements' value='true>
+		<input type='checkbox' id='ioutputxmlelements' class='cinput1' name='outputXMLElements' value='true'>
 	      <label for='ioutputxmlelements'>values as elements rather than attributes</label>
 		<input type='text' id='ioutputxmlname' class='cinput1' name='outputName' placeholder='element name (optional)'>
 	  </span>
