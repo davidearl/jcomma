@@ -65,7 +65,7 @@ $(function(){
 	
 	$("#ireset").click(function(e){
 		e.preventDefault(); e.stopPropagation();
-		loadspec("{\"comment\":\"\",\"outputTo\":\"attachment\",\"outputFormat\":\"jsonarray\",\"encoding\":\"auto\",\"headerRows\":0,\"rowCount\":1}");	
+		loadspec("{\"comment\":\"\",\"outputTo\":\"attachment\",\"outputFormat\":\"json\",\"encoding\":\"auto\",\"headerRows\":0,\"rowCount\":1}");	
 	});
 	
 	function recurse(level, jel){
