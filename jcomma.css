@@ -1,0 +1,201 @@
+/* reset... */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	background: transparent;
+	border: 0;
+	margin: 0;
+	padding: 0;
+	vertical-align: baseline;
+}
+body {
+	line-height: 1;
+}
+h1, h2, h3, h4, h5, h6 {
+	clear: both;
+	font-weight: normal;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote {
+	quotes: none;
+}
+blockquote:before, blockquote:after {
+	content: '';
+	content: none;
+}
+del {
+	text-decoration: line-through;
+}
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+a img {
+	border: none;
+}
+
+/* ------------------ */
+
+body {
+	font-family: "Open Sans", sans-serif;
+	line-height: 1.8;
+	margin: 10px;
+}
+
+.cproforma {
+	background-color: pink;
+	border: 1px solid red;
+	display: none; /* initially */
+}
+
+.cinitiallyhidden {
+	display: none;
+}
+
+.cfurtheroptions {
+	display: inline-block;
+}
+
+.cadd, .cremove, .cmove {
+	position: relative;
+	top: 4px;
+	width: 30px;
+	height: 30px;
+	margin-right: 5px;
+	cursor: pointer;
+}
+
+.cremove, .cmove {
+	float: left;
+}
+
+.cbulleted {
+	list-style-type: ring;
+	list-style: initial;
+}
+.cbulleted li {
+	margin: 0 0 0 1.5em;
+}
+
+.csection {
+	vertical-align: top;
+}
+
+.clabelheader {
+	font-weight: bold;
+}
+
+.cgroup, .cadd {
+	margin-left: 70px;
+}
+
+input[type=text] {
+	padding: 5px;
+	margin-bottom: 3px;
+	font-size: 1em;
+	border: 1px solid #888;
+}
+
+.cshortinput {
+	width: 30px;
+	text-align: right;
+}
+
+.csubmission {
+	display: inline-block;
+}
+
+select {
+	padding: 5px;
+	margin-bottom: 3px;
+	font-size: 1em;
+}
+
+.cfields {
+	border: 1px solid #888;
+	padding: 5px;
+	margin: 5px 5px 5px 70px;
+	background: #eeeeee;
+}
+
+#icomment {
+	width: 40%;
+	height: 100px;
+}
+
+#isubmit {
+	font-size: 180%;
+	margin: 10px 0;
+}
+
+#icsv {
+	font-size: 120%;
+	margin: 5px;
+}
+
+a {
+	cursor: pointer;
+	color: blue;
+	text-decoration: underline;
+}
+
+#ihelp {
+	display: none;
+	position: absolute;
+	top: 70px;
+	right: 20px;
+	width: 400px;
+	padding: 10px;
+	-webkit-box-shadow: 6px 6px 16px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 6px 6px 16px 0px rgba(0,0,0,0.75);
+	box-shadow: 6px 6px 16px 0px rgba(0,0,0,0.75);
+	border: 1px solid black;
+	background: white;
+}
+
+#ihelpcontainer iframe {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+#ihelpcontainer {
+	border-top: 30px solid white;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+#ihelpcontrols {
+	text-align: right;
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 5px;
+}
+
+.cinfo {
+	display: inline-block;
+	position: relative;
+	top: 5px;
+	height: 25px;
+	width: 25px;
+	background: url(/info.png) 0 0 no-repeat;
+}
+
+.cqif {
+	display: none; /* initially */
+}
+
+.cfilewarning {
+	font-weight: bold;
+	color: tomato;
+}
