@@ -29,7 +29,7 @@ Fill in the form and click **Do It!**. Each reload of the page remembers the set
 (#huseapi)
 ### Via API
 
-Do a multipart-encoded POST to /jcomma.php, providing the CSV file as 'csv' and the specification as 'spec', a JSON string encoding all the options, as shown below, in a single POST parameter. For example:
+Do a multipart-encoded POST to /jcomma.php, providing the CSV file as 'csv' and the specification as 'spec', a JSON string encoding all the options, <a href='#hspec'>as shown below</a>, in a single POST parameter. For example:
 
         curl -F "spec=@spec.json" -F "csv=@my.csv" "https://jcomma.savesnine.info/jcomma.php"
 
@@ -41,7 +41,7 @@ You can use the web app to make a spec file, save it, and then use that programa
 To use as a library include jcomma.class.php in your PHP application, and use like this:
 
     $j = new jcomma($pathtocsv, $specobject /* not JSON: already decoded */);
-    $errors = $j->validate(); // produces array of error message strings, or empty arry iof spec is OK
+    $errors = $j->validate(); // produces array of error message strings, or empty array if spec is OK
     if (empty($errors)) {
         $result = $j->convert(); // produces array of objects
         $jcomma->output($result, $filename, $cl); /* optional: if you want to actually emit a file or string */
@@ -49,7 +49,7 @@ To use as a library include jcomma.class.php in your PHP application, and use li
 
 $spec->outputTo can be set to 'string' (unlike when used via the API), when it
 is converted to the output format but returned as a
-string rather than to stdout. $cl=TRUE is optional, and omits all headers
+string rather than emitted to stdout. $cl=TRUE ("command line") is optional, and omits all headers
 
 (#huseshell)
 ### In a shell command line
@@ -58,14 +58,14 @@ Like this, for example:
 
     php jcomma.php -s spec.json my.csv
 
-The result is written to standard output. spec.json is the file containing a json representation of the options, as shown below. If the input csv path is '-' or omitted, it is read from standard input, so the command can be used in a pipe:
+The result is written to standard output. spec.json is the file containing a json representation of the options, <a href='#hspec'>as shown below</a>. If the input csv path is '-' or omitted, it is read from standard input, so the command can be used in a pipe:
 
     echo my.csv | php jcomma.php -s spec.json > my.xml
 
 (#hloadsettings)
 ## Load settings from file
 
-You can load all the settings previously saved with the link at the bottom of the page (or prepared elswhere) by opening the JSON file here onto the **choose file** button here. In Chrome you can just drop the file onto the button.
+You can load all the settings previously saved with the link at the bottom of the page (or prepared elswhere) by opening the JSON file with the **choose file** button here. In Chrome you can just drop the file onto the button.
 
 (#hresetsettings)
 ## Reset settings
@@ -78,19 +78,19 @@ Clicking this just resets the page to the simplest possible settings for you to 
 (#hcomment)
 ### Comment
 
-This is just saved with the settings so when you look in the file there is something to tell you what it is for. It's not saved with the output.
+This is just saved with the settings so when you look in the file there is something to tell you what it is for. It's not saved with the output, just with <a href='#hspec'>the spec</a>.
 
 (#houtputto)
 ### Output to
 
 Choose whether to save the output to a downloaded file or to display it in a browser tab. Note that csv and xlsx files are always downloaded (because browsers don't know what to do with them).
 
-This corresponds to the `"outputTo": "wherever"` [in the spec](#hspec), and when used as the library, a third 'string' is available to retrieve the result as a string.
+This corresponds to the `"outputTo": "..."` [in the spec](#hspec), with values 'inline' (for display) and 'attachment' (for download), and when used as the library 'string' to retrieve the result as a string.
 
 (#houtputformat)
 ### Output format
 
-jcomma can write its result in a variety of formats (`"outputStyle": "json"` for example [in the spec](#hspec). Some of these have additional options:
+jcomma can write its result in a variety of formats (`"outputFormat": "json"` for example [in the spec](#hspec)). Some of these have additional options:
 
 * **json**: creates a JSON array of objects, one for each line, or group of lines, in the input CSV. (Note: JSON is encoded as UTF-8 by definition).
     * ***pretty print*** (`"outputStyle": "pretty"` [in the spec](#hspec)): lays out the JSON output in an easier-to-read layout rather than all in one line
@@ -124,9 +124,9 @@ Select the CSV file to process. In Chrome you can just drag and drop the file on
 (#hencoding)
 ### Input CSV encoding
 
-CSV files are completely ambiguous when it comes to characters that aren't represented in the basic ASCII character set, such as accented characters, currency symbols and exotic punctuation, not to mention whole languages like Japanese and Hebrew. While Excel does have an option to choose the character set when it is saved, most people do not know about it and are completely unaware of the consequences, namely that a consumer of the CSV may not see currency symbols correctly. Typically Excel exports CSVs using a special Windows character set, while Google Sheets does so using the standard international character set called UTF-8.
+CSV files are completely ambiguous when it comes to characters that aren't represented in the basic ASCII character set, such as accented characters, currency symbols and exotic punctuation, not to mention whole languages like Japanese and Hebrew. While Excel does have an option to choose the character set when it is saved, most people do not know about it and are completely unaware of the consequences, namely that a consumer of the CSV may not see currency symbols or non-English names correctly. Typically Excel exports CSVs using a special Windows character set, while Google Sheets does so using the standard international character set called UTF-8.
 
-This option (`"encoding": "whatever"` [in the spec](#hspec)) lets you explicitly state which character set to expect in the CSV (we will try to detect this when set to auto, but it is not always possible to be correct.
+This option (`"encoding": "whatever"` [in the spec](#hspec)) lets you explicitly state which character set to expect in the CSV (we will try to detect this when set to auto, but it is not always possible to be correct).
 
 (#hheaderrows)
 ### Header rows
@@ -160,18 +160,18 @@ Note that rows are not ignored in this way when extracting any header row(s) (wh
 (#hrecords)
 ## Output records
 
-Typically you'll produce one output record for each input row (that isn't ignored according to [ignore rows](#hignorerows) or group of however many rows given by ['Each record formed from...'](#hrowcount). However, occasionally it may be helpful to make more than one record for each row. Each such record would appear consecutively in the output, e.g. as an object in a JSON array or an extra row in an output CSV.
+Typically you'll produce one output record for each input row (that isn't ignored according to [ignore rows](#hignorerows)) or group of however many rows given by ['Each record formed from...'](#hrowcount). However, occasionally it may be helpful to make more than one record for each row. Each such record would appear consecutively in the output, e.g. as an object in a JSON array or an extra row in an output CSV.
 
-For example, you might produce two records from a PayPal transaction where you want to represent a payment as one record (a credit), and the paypal fee (which paypal puts in the same row in its exports) as another (a debit: a bank charge).
+For example, you might produce two records from a PayPal transaction where you want to represent a payment as one record (a credit), and the PayPal fee (which PayPal puts in the same row in its exports) as another (a debit: a bank charge).
 
-Therefore, the + here lets you add one or more specifications of records to be produced, though you'll often only need one. ([in the spec](#hspec), *"records": [ ... ]* reflects this). Click X to remove one, and drag &#x2195; to change the order
+Therefore, the + here lets you add one or more specifications of records to be produced, though you'll often only need one. (`"records": [ ... ]` [in the spec](#hspec)). Click X to remove one, and drag &#x2195; to change the order
 
 Each record then comprises a set of fields, and a set of conditions based on those fields when the record will be discarded.
 
 (#hfields)
 ## Fields of output record
 
-Each field (`"fields": [ ... ]` [in the spec](#hspec)) is given a name, one or more columns and bits of verbatim text from which its value is initially composed, and a list of options applied in turn which can transform, omit or reject the value.
+Each field (`"fields": [ ... ]` [in the spec](#hspec)) of a record comprises a name, one or more columns and bits of verbatim text from which its value is initially composed, and a list of options applied in turn which can transform, omit or reject the value.
 
 Add a new field with +, delete an existing one with X, and drag &#x2195; to change the order
 
@@ -214,7 +214,7 @@ You can usefully have more than one field with the same name (usually consecutiv
 (#hcomprising)
 ### Field concatenated from
 
-You can concatenate several columns, interleaved with verbatim separators, to make one output field, before applying any options. For example, some banks provide several fields which one might usefully put into a single Description field.
+Concatenate several columns, interleaved with verbatim separators, to make one output field, before applying any options. For example, some banks provide several fields which one might usefully put into a single Description field. You would almost always need at least one column.
 
 Where there is more than one input row ([rowCount](#hrowcount) is greater than 1), you'll need to say from which of those rows the CSV cell is obtained (this also allows you to concatenate several values vertically from the same column), by giving the row offset (0 for the first row, 1 for the second in each group of rows, and  so on).
 
@@ -223,11 +223,11 @@ Click + to include a new column or text, X to remove one, and drag &#x2195; to c
 (#hoptions)
 ### Field options
 
-After a field value is derived by concatenation from various cells in the CSV, that value can be transformed in a variety of ways using field options. More than one option can be applied, in the order they are given. Click + to add a new option, X to delete an existing one, and drag &#x2195; to change the order.
+After a field value is derived by concatenation from one or more cells in the CSV, that value can be transformed in a variety of ways using field options. More than one option can be applied, in the order they are given. Click + to add a new option, X to delete an existing one, and drag &#x2195; to change the order.
 
 Available options are as follows:
 
-* ***ignore currency symbols...*** (`"item": "ignoreCurrency", "currencies": "&pound;..."` [in the spec](#hspec)): Any currency symbols (or indeed any other single character) that appears in the list provided are removed from the field value, wherever they appear in the string. Examples: if the currency list was just "&pound;", and the value so far is "£123.45", the result would be "123.45". However, if the list were "&deg;" (the degree symbol) and the value was "90&deg;" this option can also be used to remove that, yielding "90".
+* ***ignore currency symbols...*** (`"item": "ignoreCurrency", "currencies": "..."` [in the spec](#hspec)): Any currency symbols (or indeed any other single character) that appears in the list provided are removed from the field value, wherever they appear in the string. Examples: if the currency list was just "&pound;", and the value so far is "£123.45", the result would be "123.45". However, if the list were "&deg;" (the degree symbol) and the value was "90&deg;" this option can also be used to remove that, yielding "90".
 
 * ***treat '(1.23)' or '1.23-' as negative...*** (`"item": "bookkeepersNegative"` [in the spec](#hspec)): accounts sometimes represent negative numbers by enclosing them in parentheses (which makes them more obvious, but hard to process), or even sometimes with a trailing instead of leading minus sign. Convert these into proper negatives with this option. Note that you are still left with a string at the end of this and should probably also convert it to a number (below). Examples: "(123.45)" &rarr; "-123.45"; "123.45-" &rarr; "-123.45".
 
@@ -239,7 +239,7 @@ Available options are as follows:
 
 * ***output as number*** (`"item": "convertToNumber", "errorOnType": true, "negate": true` [in the spec](#hspec)): Converts the value to a number in the output, so that you can do artihmetic on it in the output for example (it is also then amenable to the greater and less options in subsequent tests here). If the string value cannot be converted ("12a" for example), then the whole CSV conversion is stopped with an appropriate error message if the ***stop on conversion*** box is checked, or output as 0 (zero) otherwise. If the ***negate after conversion*** box is checked, the result is the negative of the converted number. For example the debit column of a bank statement may need to produce the negative of the cell contents if being combined with a credit column.
 
-* ***output as ISO date*** (`"item": "convertToDate", "errorOnType": true, "dateFormatUS": true, "dateFormatTime": true` [in the spec](#hspec)): Converts the value to standardised date whatever its original form. The output format is specified by international standard [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) and looks like "2016-12-02" or "2016-12-02T13:36:45+00:00" if the time is included; many systems recognise this format which is both easily sortable and unambiguous. Conversion uses the Linux [strtotime](http://php.net/manual/en/function.strtotime.php) function, so it understands a wide variety of possible values. However, European and US dates written using slashes, such as "3/4/2016" are ambiguous (European is d/m/y hence 3 April, while US is m/d/y, hence March 4), so the ***US dates*** check box allows you to indicate which the CSV contains (US if on). (It does this by replacing slashes with dashes in the European case before presenting to strtotime.). If the value is not a comprehensible date, then either the whole CSV conversion is stopped if the ***stop on conversion*** box is checked, or output as an empty string otherwise.
+* ***output as ISO date*** (`"item": "convertToDate", "errorOnType": true, "dateFormatUS": true, "dateFormatTime": true` [in the spec](#hspec)): Converts the value to a standardised date whatever its original form. The output format is specified by international standard [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) and looks like "2016-12-02" or "2016-12-02T13:36:45+00:00" if the time is included; many systems recognise this format which is both easily sortable and unambiguous. Conversion uses the Linux [strtotime](http://php.net/manual/en/function.strtotime.php) function, so it understands a wide variety of possible values. However, European and US dates written using slashes, such as "3/4/2016" are ambiguous (European is d/m/y hence 3 April, while US is m/d/y, hence March 4), so the ***US dates*** check box allows you to indicate which the CSV contains (US if checked). (It does this by replacing slashes with dashes in the European case before presenting to strtotime). If the value is not a comprehensible date, then either the whole CSV conversion is stopped if the ***stop on conversion*** box is checked, or output as an empty string otherwise.
 
 * ***output as custom date*** (`"item": "convertToCustomDate", "errorOnType": true, "dateFormatUS": true, "dateFormatStyle": "j M Y"` [in the spec](#hspec)): Similar to ISO date, but you can specify the output style yourself (including time parts). This uses the [PHP date function](http://php.net/manual/en/function.date.php) in which letters in the date style are replaced by parts of the date or time. For example "M j, Y" produces dates like "Dec 1, 2016" because M means the abbreviated month name, j means the day without leading zeros and Y means the four digit year. Many other variants are possible - see [date](http://php.net/manual/en/function.date.php).
 
@@ -247,29 +247,30 @@ Available options are as follows:
 
 * ***stop with error if value...*** (`"item": "errorOnValue", "condition": "...", ...` [in the spec](#hspec)): Having transformed the field by whatever other methods, the whole conversion process can be terminated if the [condition](#hcondition) selected here is satisifed: for example if an unexpected value is encountered.
 
-## (#unless)Don't output record...
+(#hunless)
+### Don't output record...
 
 Having calculated all the fields for a record, the values computed can be used to determine that their record should not be included in the output at all if any of the [conditions](#hconditions) given here are satisfied. Press + to add a new condition, X to remove an existing one, and drag &#x2195; to change the order.
 
 (#hsavesettings)
 ## Save settings to file
 
-All the settings described in the form are saved as a jcomma specification, a JSON file, to a local file. Note that changes are saved on every change so if the page is reloaded, changes are not lost.
+All the settings described in the form are saved as a jcomma specification, a JSON file, to a local file. Note that settings are saved on every change so if the page is reloaded, changes are not lost.
 
-As well as [restoring them](#hloadsettings) to the page, saved settings can be used in automated workflows using jcomma, so the specifications do not need to be hand written in JSON.
+As well as [restoring them](#hloadsettings) to the page, saved settings can be used in automated workflows using jcomma, so that the specifications do not need to be hand written in JSON.
 
 ## Settings which are used in several places
 
 (#hconditions)
 ### Conditions
 
-* ***empty (no text at all)*** (`"condition": "empty"` [in the spec](#hspec)): there is nothing in the incoming cell, not even a space, or for field either the field does not exist or is an empty string.
-* ***whitespace only or empty*** (`"condition": "white"` [in the spec](#hspec)): ignore the row if the specified value is empty, as above, or just contains spaces, tabs, newline or line-feed characters, in any combination.
-* ***matches regular expression*** (`"condition": "match", "value": "regexp"` [in the spec](#hspec)): ignore the row if the value matches the provided regular expression, which expresses a pattern to match against. See [regular expressions](#hregularexpression)
-* ***does not match regular expression*** (`"condition": "nomatch", "value": "regexp"` [in the spec](#hspec)): ignore the row if the value does **not** match the provided [regular expression](#hregularexpression)
-* ***equal to*** (`"condition": "eq", "value": "whatever"` [in the spec](#hspec)): ignore the row if the value is the same as that given. Input cells and output fields which are strings are compared as strings, but fields which are converted to numbers are compared numerically with the given value, so it may be better to use this condition with output fields when numbers are involved.
-* ***not equal to*** (`"condition": "ne", "value": "whatever"` [in the spec](#hspec)): ignore the row if the value is not the same as that given. Comparison as for 'equal to'.
-* ***greater or equal to*** (`"condition": "ge", "value": 123` [in the spec](#hspec)): the cell or field is >= that given this only makes sense for numbers, so both input and output values are first converted to numbers if necessary, and then compared as numbers.
+* ***empty (no text at all)*** (`"condition": "empty"` [in the spec](#hspec)): there is nothing in the value, not even a space, or for field either the field does not exist or is an empty string.
+* ***whitespace only or empty*** (`"condition": "white"` [in the spec](#hspec)): if the value is empty, as above, or just contains spaces, tabs, newline or line-feed characters, in any combination.
+* ***matches regular expression*** (`"condition": "match", "value": "regexp"` [in the spec](#hspec)): if the value matches the provided regular expression. See [regular expressions](#hregularexpression)
+* ***does not match regular expression*** (`"condition": "nomatch", "value": "regexp"` [in the spec](#hspec)): if the value does **not** match the provided [regular expression](#hregularexpression)
+* ***equal to*** (`"condition": "eq", "value": "whatever"` [in the spec](#hspec)): if the value is the same as that given. Input cells and output fields which are strings are compared as strings, but fields which are converted to numbers are compared numerically with the given value, so it may be better to use this condition with output fields when numbers are involved.
+* ***not equal to*** (`"condition": "ne", "value": "whatever"` [in the spec](#hspec)): if the value is not the same as that given. Comparison as for 'equal to'.
+* ***greater or equal to*** (`"condition": "ge", "value": 123` [in the spec](#hspec)): the value is >= that given this only makes sense for numbers, so both input and output values are first converted to numbers if necessary, and then compared as numbers.
 * ***less or equal to*** (`"condition": "le", "value": 123` [in the spec](#hspec)): <= - numerically, as for 'greater or equal to'.
 
 (#hregularexpression)
@@ -292,60 +293,61 @@ Where replacement is offered, parenthesised matches can be substituted using $1,
 
 The values entered into the form are turned into a JSON object. This can be [saved to a file](#hsavesettings).
 
-When used from the [API](#huseapi), as a [library](#huselibrary), or in a [shell command](#huseshell), the specification is supplied in this structured form.
+When used from the [API](#huseapi), as a [library](#huselibrary), or in a [shell command](#huseshell), the specification is supplied in this structured form. (Yes, I know JSON can't really have comments like this).
 
     {
-        outputFormat: "json", # csv, html, xlsx, xml
-        outputStyle: "pretty", # for json
-        outputBulkElastic: "true", # for json, any non empty value
-        outputName: "whatever", # filename, also used to name elements where needed by format
-        outputTo: "inline", # or "attachment", or when used as a library, "string"
-        outputEncoding: "UTF-8", # or "Windows", for CSV files only (the others are fixed by the file format)
-        outXMLElements: "true", # <x><k>v</k>...</x> rather than <x k="v" ...></x>
-        encoding: "UTF-8",
-        headerRows: 8,
-        rowCount: N, # default 1
-        ignoreRows: [ # one or more of these (row ignored if any are true):
-            {item: "column", name: "A", condition: "...", value: V}, # conditions as before
-            {item: "field", name: "name", condition: "...", value: V},
+        "outputFormat": "json", # csv, html, xlsx, xml
+        "outputStyle": "pretty", # for json
+        "outputBulkElastic": "true", # for json, any non empty value
+        "outputName": "whatever", # filename, also used to name elements where needed by format
+        "outputTo": "inline", # or "attachment", or when used as a library, "string"
+        "outputEncoding": "UTF-8", # or "Windows-1251". For CSV files only (the others are fixed by the file format)
+        "outXMLElements": "true", # <x><k>v</k>...</x> rather than <x k="v" ...></x>
+        "encoding": "UTF-8",
+        "headerRows": 8,
+        "rowCount": 1, # default 1
+        "ignoreRows": [ # one or more of these (row ignored if any is true):
+            {"item": "column", "name": "A", "condition": "...", "value": "..."}, # conditions as before
+            {"item": "field", "name": "name", "condition": "...", "value": "..."},
             ...
         ],
-        records: [
+        "records": [
             {
-                fields: [
-                    {   name: "...",
-                        comprising: [
-                            {item: "column",
-                            column: "A",
-                            rowOffset: N # optional, N=0 by default, otherwise from row relative to current from the N specified for the record in rowCount
+                "fields": [
+                    {   "name": "...",
+                        "comprising": [
+                            {"item": "column",
+                             "column": "A",
+                             "rowOffset": 0 # optional, N=0 by default, otherwise from row relative to current from the N specified for the record in rowCount
                             },
-                            {item: "text", text: "whatever"},
+                            {"item": "text", "text": "whatever"},
                             ...
                         ],
-                        options: [ # any of the following, evaluated in turn:
-                            {item: "ignoreCurrency", currencies: "pound-sign etc"},
-                            {item: "bookkeepersNegative"}, # (123) or 123- => -123
-                            {item: "trim"}, # trim surrounding white space
-                            {item: "replaceString", matches: "string", output: "substitution"},
-                            {item: "replaceRegExp", matches: "regexp", output: "stringwithdollarsubstitutions"},
-                            {item: "convertToNumber", errorOnType: true, negate: true}, # any non blank value ok for options
-                            {item: "convertToDate", errorOnType: true, dateFormatUS: true, dateFormatTime: true},
-                            {item: "convertToCustomDate", errorOnType: true, dateFormatUS: true, dateFormatStyle: "j M Y"}, # per PHP date function
-                            {item: "omitIf", condition: "match", value: V},
-                            {item: "errorOnValue", condition: "match", value: V} # match, eq etc, blank, white, nonNumeric
+                        "options": [ # any of the following, evaluated in turn:
+                            {"item": "ignoreCurrency", "currencies": "pound-sign etc"},
+                            {"item": "bookkeepersNegative"}, # (123) or 123- => -123
+                            {"item": "trim"}, # trim surrounding white space
+                            {"item": "replaceString", "matches": "string", "output": "substitution"},
+                            {"item": "replaceRegExp", "matches": "regexp", "output": "stringwithdollarsubstitutions"},
+                            {"item": "convertToNumber", "errorOnType": true, "negate": true}, # any non blank value ok for options
+                            {"item": "convertToDate", "errorOnType": true, "dateFormatUS": true, "dateFormatTime": true},
+                            {"item": "convertToCustomDate", "errorOnType": true, "dateFormatUS": true, "dateFormatStyle": "j M Y"}, # per PHP date function
+                            {"item": "omitIf", "condition": "match", "value": "..."},
+                            {"item": "errorOnValue", "condition": "match", "value": "..."} # match, eq etc, blank, white, nonNumeric
                         ]
                     } ,
                     ... # more fields
                 ],
-                unless: [ # generate record from row unless condition is true
-                    { field: "name", condition: "eq", value: V},
+                "unless": [ # generate record from row unless condition is true
+                    { "field": "name", "condition": "eq", "value": "..."},
                     ... # more 'unless' conditions, record discarded if any is true
                 ]
-            }
+            },
             ... # more records (occasionally)
         ]
     }
 
+(#hinstallation)
 ## Installation
 
 Requires PHP >= 5.4. Does not work on older browsers (it's using a recent version of jQuery).
@@ -356,7 +358,7 @@ You might want to increase the individual file and total file upload limits in y
 
 ## Acknowledgments
 
-Apart from PHP and server software, the only dependencies are [PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter) for the xlsx file format output, licensed under the MIT license, and [jQuery](https://jquery.com/), also MIT license.
+Apart from PHP and server software, the only dependencies are [PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter) for the xlsx file format output, licensed under the MIT license, and [jQuery](https://jquery.com/) and [jQuery UI](https://jqueryui.com/), also MIT license.
 
 
 
