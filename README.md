@@ -330,6 +330,7 @@ When used from the [API](#huseapi), as a [library](#huselibrary), or in a [shell
                             {item: "replaceRegExp", matches: "regexp", output: "stringwithdollarsubstitutions"},
                             {item: "convertToNumber", errorOnType: true, negate: true}, # any non blank value ok for options
                             {item: "convertToDate", errorOnType: true, dateFormatUS: true, dateFormatTime: true},
+                            {item: "convertToCustomDate", errorOnType: true, dateFormatUS: true, dateFormatStyle: "j M Y"}, # per PHP date function
                             {item: "omitIf", condition: "match", value: V},
                             {item: "errorOnValue", condition: "match", value: V} # match, eq etc, blank, white, nonNumeric
                         ]

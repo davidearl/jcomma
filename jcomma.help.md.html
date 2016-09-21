@@ -286,6 +286,7 @@ string rather than to stdout. $cl=TRUE is optional, and omits all headers</p>
                         {item: &quot;replaceRegExp&quot;, matches: &quot;regexp&quot;, output: &quot;stringwithdollarsubstitutions&quot;},
                         {item: &quot;convertToNumber&quot;, errorOnType: true, negate: true}, # any non blank value ok for options
                         {item: &quot;convertToDate&quot;, errorOnType: true, dateFormatUS: true, dateFormatTime: true},
+                        {item: &quot;convertToCustomDate&quot;, errorOnType: true, dateFormatUS: true, dateFormatStyle: &quot;j M Y&quot;}, # per PHP date function
                         {item: &quot;omitIf&quot;, condition: &quot;match&quot;, value: V},
                         {item: &quot;errorOnValue&quot;, condition: &quot;match&quot;, value: V} # match, eq etc, blank, white, nonNumeric
                     ]
@@ -301,11 +302,11 @@ string rather than to stdout. $cl=TRUE is optional, and omits all headers</p>
     ]
 }
 </code></pre>
-<h2><a id="Installation_347"></a>Installation</h2>
+<h2><a id="Installation_348"></a>Installation</h2>
 <p>Requires PHP &gt;= 5.4. Does not work on older browsers (it’s using a recent version of jQuery).</p>
 <p>Just put the files in the document root of your web server, ideally a https website, or as a sub-directory of a website.</p>
 <p>You might want to increase the individual file and total file upload limits in your server settings from the PHP default.</p>
-<h2><a id="Acknowledgments_355"></a>Acknowledgments</h2>
+<h2><a id="Acknowledgments_356"></a>Acknowledgments</h2>
 <p>Apart from PHP and server software, the only dependencies are <a href="https://github.com/mk-j/PHP_XLSXWriter">PHP_XLSXWriter</a> for the xlsx file format output, licensed under the MIT license, and <a href="https://jquery.com/">jQuery</a>, also MIT license.</p>
 
 </body></html>
