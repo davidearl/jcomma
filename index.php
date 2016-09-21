@@ -22,7 +22,7 @@
 	<li>as a <a class='chelp' href='help.php?a=huselibrary'>library</a> integrated into another product</li>
 	<li>in a Linux or Windows <a class='chelp' href='help.php?a=huseshell'>shell command</a> or pipe</li>
   </ul>
-  <p><a href='https://github.com/davidearl/jcomma/blob/master/LICENSE'>MIT License</a> | <a href='https://github.com/davidearl/jcomma'>On GitHub</a></p>
+  <p><a href='help.php' target='jcommahelp'>Help</a> | <a href='https://github.com/davidearl/jcomma/blob/master/LICENSE'>MIT License</a> | <a href='https://github.com/davidearl/jcomma'>On GitHub</a></p>
   <hr>
 
   <div>
@@ -135,13 +135,13 @@
 	<div class='csection coptions clevel1'>
 	  <label class='clabelheader'>Ignore rows in CSV in any of these cases:</label> (except in header rows) <a class='chelp cinfo' href='help.php?a=hignorerows'></a><br>
 	  <ul class='clist'></ul>
-	  <button id='iaddignorerows' class='cadd' proforma='iignorerowsproforma'>+</button>
+	  <button id='iaddignorerows' class='cadd' proforma='iignorerowsproforma'>+</button> <span class='canother'>another ignore row condition</span>
 	</div>
 
   	<div class='csection coptions clevel1'>
 	  <label class='clabelheader'>Output records</label> (you can make more than one record from each group of rows from the CSV)<br>
 	  <ul class='clist'></ul>
-	  <button id='iaddrecord' class='cadd' proforma='irecordproforma'>+</button>
+	  <button id='iaddrecord' class='cadd' proforma='irecordproforma'>+</button> <span class='canother'>another record</span>
 	</div>
 
     <div class='csection clevel1'>
@@ -184,14 +184,14 @@
 		<label class='clabelheader'>Fields of output record:</label>
 		  <a class='chelp cinfo' href='help.php?a=hfields'></a><br>
    		<ul class='clist'></ul>
-		<button id='iaddfield' class='cadd' proforma='ifieldproforma'>+</button>
+		<button id='iaddfield' class='cadd' proforma='ifieldproforma'>+</button> <span class='canother'>another field</span>
 	  </div>
 
 	  <div class='coptions cgroup'>
 		<label class='clabelheader'>Don't output record in any of theses cases:</label>
 		  <a class='chelp cinfo' href='help.php?a=hunless'></a><br>
   		<ul class='clist'></ul>
-		<button id='iaddrecordif' class='cadd' proforma='irecordifproforma'>+</button>
+		<button id='iaddrecordif' class='cadd' proforma='irecordifproforma'>+</button> <span class='canother'>another "don't output record" condition</span>
 	  </div>	
 	</li>
 
@@ -246,12 +246,12 @@
 		<label class='clabelheader'>Field concatenated from:</label>
 		  <a class='chelp cinfo' href='help.php?a=hcomprising'></a><br>
 		  <ul class='clist'></ul>
-		  <button id='iaddfieldcomprising' class='cadd' proforma='ifieldcomprisingproforma'>+</button>
+		  <button id='iaddfieldcomprising' class='cadd' proforma='ifieldcomprisingproforma'>+</button> <span class='canother'>another column or text</span>
 		<br>
 		<label class='clabelheader'>Field options:</label> (applied in order)
 		  <a class='chelp cinfo' href='help.php?a=hoptions'></a><br>
 		  <ul class='clist'></ul>
-		  <button id='iaddfieldoption' class='cadd' proforma='ifieldoptionproforma'>+</button>
+		  <button id='iaddfieldoption' class='cadd' proforma='ifieldoptionproforma'>+</button> <span class='canother'>another option</span>
 	  </div>
 	</li>
 

@@ -11,7 +11,7 @@ For example, banks frequently generate CSVs with:
 * positive values (e.g. deposits) in one column and negatives in another (e.g. withdrawals) where you just want a single number which is positive or negative.
 
 
-Furthermore, CSV files don't have any means to indicates what
+Furthermore, CSV files don't have any means to indicate what
 character set encoding they use, and very often Excel - or the
 person who used Excel to send it to you - produces one (typically
 Windows) and your consumer needs another (often UTF-8). Particularly
