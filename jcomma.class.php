@@ -31,43 +31,64 @@ class jcomma {
     }
     $n1 = strpos(self::$alphabet, $l[0]);
     $n1 = strpos(self::$alphabet, $l[1]);
-    if ($n1 === FALSE || $n2 == FALSE) { self::oops('invalid column letter'); }
+    if ($n1 === FALSE || $n2 == FALSE) { self::oops('invalid column letter: '.$l); }
     return $n1 * 26 + $n2;
+  }
+
+  function describefield($field, $text=NULL, $value=NULL){
+    $s = '';
+    $p = '';
+    foreach ($field as $f) {
+      if (gettype($f) == 'integer') { $s .= "[{$f}]"; }
+      else { $s .= "{$p}{$f}"; }
+      $p = '.';
+    }
+    if (! is_null($value)) { $s .= " ({$value})"; }
+    if (! is_null($text)) { $s .= " {$text}"; }
+    return $s;
   }
   
   function checkint($field, $ge=NULL, $default=NULL){
     $v = $this->inspec($field, $default);
     if (gettype($v) != 'integer') {
-      $this->errors[] = implode(', ', $field).' is not an integer';
+      $this->errors[] = $this->describefield($field, 'is not an integer', $v);
       return $v;
     }
     if (! is_null($ge) && $v < $ge) {
-      $this->errors[] = implode(', ', $field)." is less than {$ge}";
+      $this->errors[] = $this->describefield($field, "is less than {$ge}", $v);
       return $v;
     }
     return $v;
   }
 
+  function checkfloat($field, $default=NULL){
+    $v = $this->inspec($field, $default);
+    if (! is_numeric($v)) {
+      $this->errors[] = $this->describefield($field, 'is not a number', $v);
+      return $v;
+    }
+  }
+
   function checkarray($field, $default=NULL) {
     $v = $this->inspec($field, $default);
-    if (! is_array($v)) { $this->errors[] = implode(', ', $field).' is not an array'; }
+    if (! is_array($v)) { $this->errors[] = $this->describefield($field, 'is not an array'); }
     return $v;
   }
 
   function checkobject($field, $default=NULL) {
     $v = $this->inspec($field, $default);
-    if (! is_object($v)) { $this->errors[] = implode(', ', $field).' is not an object'; }
+    if (! is_object($v)) { $this->errors[] = $this->describefield($field, 'is not an object'); }
     return $v;
   }
 
   function checkstring($field, $permitted=NULL, $emptyallowed=FALSE, $default=NULL) {
     $v = $this->inspec($field, $default);
     if (! is_string($v)) {
-      $this->errors[] = implode(', ', $field).' is not a string';
+      $this->errors[] = ' is not a string';
     } else if (! is_null($permitted) && ! in_array($v, $permitted)) {
-      $this->errors[] = implode(', ', $field).' is not a one of '.implode(', ', $permitted);
+      $this->errors[] = $this->describefield($field, 'is not a one of '.implode(', ', $permitted), $v);
     } else if (! $emptyallowed && $field == '') {
-      $this->errors[] = implode(', ', $field).' is empty';
+      $this->errors[] = $this->describefield($field, 'is empty');
     }
     return $v;
   }
@@ -84,7 +105,7 @@ class jcomma {
       break;
     case 'ge':
     case 'le':
-      $this->checkint($field);
+      $this->checkfloat($field);
       break;
     }
     return $condition;
@@ -102,21 +123,21 @@ class jcomma {
       $last = $i == count($field)-1;
       if (gettype($f) == 'integer') {
         if (! is_array($o)) {
-          $this->errors[] = implode(', ', $field). " array expected";
+          $this->errors[] = $this->describefield($field, '- array expected');
           $o = array();
         }
         if (! isset($o[$f])) {
-          if (is_null($default)) { $this->errors[] = implode(', ', $field). " is missing"; return NULL; }
+          if (is_null($default)) { $this->describefield($field, 'is missing'); return NULL; }
           $o[$f] = $last ? $default : (gettype($field[$i+1] == 'integer') ? array() : new stdClass());
         }
         $o = $o[$f];
       } else {
         if (! is_object($o)) {
-          $this->errors[] = implode(', ', $field). " object expected";
+          $this->errors[] = $this->describefield($field, '- object expected');
           $o = new stdClass();
         }
         if (! isset($o->$f)) {
-          if (is_null($default)) { $this->errors[] = implode(', ', $field). " is missing"; }
+          if (is_null($default)) { $this->errors[] = $this->describefield($field, 'is missing'); }
           $o->$f = $last ? $default : (gettype($field[$i+1] == 'integer') ? array() : new stdClass());
         }
         $o = $o->$f;
@@ -187,7 +208,7 @@ class jcomma {
         
         $comprising = $this->checkarray(array('records', $ir, 'fields', $if, 'comprising'), array());
         if (count($comprising) == 0) {
-          $this->errors[] = implode(', ', array('records', $ir, 'fields', $if, 'comprising')).' is empty, nothing to do for this field';
+          $this->errors[] = $this->describefield(array('records', $ir, 'fields', $if, 'comprising'), 'is empty, nothing to do for this field');
         }
         for ($ic = 0; $ic < count($comprising); $ic++) {
           $item = $this->checkstring(array('records', $ir, 'fields', $if, 'comprising', $ic, 'item'),
@@ -228,9 +249,9 @@ class jcomma {
       if (gettype($vcsv) == 'integer' || gettype($vcsv) == 'float') { $vspec = (float)$vspec; }
       return $vspec != $vcsv;
     case 'ge':
-      return float($vspec) >= float($vcsv);
+      return (float)$vcsv >= (float)$vspec;
     case 'le':
-      return float($vspec) <= float($vcsv);
+      return (float)$vcsv <= (float)$vspec;
     default:
       return FALSE;
     }
