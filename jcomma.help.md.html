@@ -237,9 +237,11 @@ string rather than emitted to stdout. $cl=TRUE (“command line”) is optional,
 <li><strong><em>not equal to</em></strong> (<code>&quot;condition&quot;: &quot;ne&quot;, &quot;value&quot;: &quot;whatever&quot;</code> <a href="#hspec">in the spec</a>): if the value is not the same as that given. Comparison as for ‘equal to’.</li>
 <li><strong><em>greater or equal to</em></strong> (<code>&quot;condition&quot;: &quot;ge&quot;, &quot;value&quot;: 123</code> <a href="#hspec">in the spec</a>): the value is &gt;= that given this only makes sense for numbers, so both input and output values are first converted to numbers if necessary, and then compared as numbers.</li>
 <li><strong><em>less or equal to</em></strong> (<code>&quot;condition&quot;: &quot;le&quot;, &quot;value&quot;: 123</code> <a href="#hspec">in the spec</a>): &lt;= - numerically, as for ‘greater or equal to’.</li>
+<li><strong><em>before (date)</em></strong> (<code>&quot;condition&quot;: &quot;before&quot;, &quot;value&quot;: &quot;2016-09-23&quot;</code> <a href="#hspec">in the spec</a>): date comparison - both the date entered and the date being compared must not contain ‘/’, that is must not be ambiguous. In the case of fields, you can always convert to ISO and then convert to another format after comparison, but ignoring rows is only possible for non-ambiguous dates.</li>
+<li><strong><em>after (date)</em></strong> (<code>&quot;condition&quot;: &quot;after&quot;, &quot;value&quot;: &quot;2016-09-23&quot;</code> <a href="#hspec">in the spec</a>): date comparison, as “before”.</li>
 </ul>
 <p>(#hregularexpression)</p>
-<h3><a id="Regular_expressions_276"></a>Regular expressions</h3>
+<h3><a id="Regular_expressions_278"></a>Regular expressions</h3>
 <p>Regular expressions are a language for expressing the syntax of a string of text. jcomma uses so-called PCRE-regular expressions, <a href="http://php.net/manual/en/book.pcre.php">as in PHP</a>. The regular expression must include the delimiters (any suitable pair of characters) and any trailing modifiers.</p>
 <p>See the <a href="http://php.net/manual/en/book.pcre.php">PHP manual</a> for full details of regular expression syntax.</p>
 <p>For example, the following would match a string comprising only the letters A, B, C or a, b, c (using tilde as the delimiter, the trailing modifier ‘i’ indicating case-independence, ^ and $ requiring start and end of string, and square brackets to indicate a range of characters):</p>
@@ -248,7 +250,7 @@ string rather than emitted to stdout. $cl=TRUE (“command line”) is optional,
 <p>Note that when you need to escape a character, in a PHP string you often find you need two backslashes, one for PHP’s literal string syntax, and another for the regular expression itself. Here, these are not PHP literal strings, so only one is required.</p>
 <p>Where replacement is offered, parenthesised matches can be substituted using $1, $2 etc, just as in PHP.</p>
 <p>(#hspec)</p>
-<h2><a id="JSON_specification_the_spec_291"></a>JSON specification (“the spec”)</h2>
+<h2><a id="JSON_specification_the_spec_293"></a>JSON specification (“the spec”)</h2>
 <p>The values entered into the form are turned into a JSON object. This can be <a href="#hsavesettings">saved to a file</a>.</p>
 <p>When used from the <a href="#huseapi">API</a>, as a <a href="#huselibrary">library</a>, or in a <a href="#huseshell">shell command</a>, the specification is supplied in this structured form. (Yes, I know JSON can’t really have comments like this).</p>
 <pre><code>{
@@ -304,11 +306,11 @@ string rather than emitted to stdout. $cl=TRUE (“command line”) is optional,
 }
 </code></pre>
 <p>(#hinstallation)</p>
-<h2><a id="Installation_350"></a>Installation</h2>
+<h2><a id="Installation_352"></a>Installation</h2>
 <p>Requires PHP &gt;= 5.4. Does not work on older browsers (it’s using a recent version of jQuery).</p>
 <p>Just put the files in the document root of your web server, ideally a https website, or as a sub-directory of a website.</p>
 <p>You might want to increase the individual file and total file upload limits in your server settings from the PHP default.</p>
-<h2><a id="Acknowledgments_358"></a>Acknowledgments</h2>
+<h2><a id="Acknowledgments_360"></a>Acknowledgments</h2>
 <p>Apart from PHP and server software, the only dependencies are <a href="https://github.com/mk-j/PHP_XLSXWriter">PHP_XLSXWriter</a> for the xlsx file format output, licensed under the MIT license, and <a href="https://jquery.com/">jQuery</a> and <a href="https://jqueryui.com/">jQuery UI</a>, also MIT license.</p>
 
 </body></html>

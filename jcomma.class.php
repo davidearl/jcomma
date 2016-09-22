@@ -69,6 +69,18 @@ class jcomma {
     }
   }
 
+  function checkdate($field, $default=NULL){
+    $v = $this->inspec($field, $default);
+    if (strpos($v, '/') !== FALSE) {
+      $this->errors[] = $this->describefield($field, ' - ambiguous date format (use YYYY-MM-DD)', $v);
+      return $v;
+    }
+    if (strtotime($v) === FALSE) {
+      $this->errors[] = $this->describefield($field, 'is not a date', $v);
+      return $v;
+    }
+  }
+
   function checkarray($field, $default=NULL) {
     $v = $this->inspec($field, $default);
     if (! is_array($v)) { $this->errors[] = $this->describefield($field, 'is not an array'); }
@@ -94,7 +106,7 @@ class jcomma {
   }
 
   function checkcondition($field) {
-    $conditions = array('empty', 'white', 'match', 'nomatch', 'eq', 'ne', 'ge', 'le');
+    $conditions = array('empty', 'white', 'match', 'nomatch', 'eq', 'ne', 'ge', 'le', 'before', 'after');
     $condition = $this->checkstring($field, $conditions);
     array_pop($field);
     $field[] = 'value';
@@ -106,6 +118,10 @@ class jcomma {
     case 'ge':
     case 'le':
       $this->checkfloat($field);
+      break;
+    case 'before':
+    case 'after':
+      $this->checkdate($field);
       break;
     }
     return $condition;
@@ -240,7 +256,7 @@ class jcomma {
     case 'match':
     case 'nomatch':
       $matches = preg_match($vspec, $vcsv);
-      if ($matches === FALSE) { oops("incorrect regexp '{$vspec}'"); }
+      if ($matches === FALSE) { self::oops("incorrect regexp '{$vspec}'"); }
       return $matches == ($condition == 'match' ? 1 : 0);
     case 'eq':
       if (gettype($vcsv) == 'integer' || gettype($vcsv) == 'float') { $vspec = (float)$vspec; }
@@ -252,6 +268,12 @@ class jcomma {
       return (float)$vcsv >= (float)$vspec;
     case 'le':
       return (float)$vcsv <= (float)$vspec;
+    case 'before':
+      if (strpos($vcsv, '/') !== FALSE) { self::oops("{$vscv} is an ambiguous date format"); }
+      return strtotime($vcsv) < strtotime($vspec);
+    case 'after':
+      if (strpos($vcsv, '/') !== FALSE) { self::oops("{$vscv} is an ambiguous date format"); }
+      return strtotime($vcsv) > strtotime($vspec);
     default:
       return FALSE;
     }
@@ -355,7 +377,7 @@ class jcomma {
             case 'replaceRegExp':
               if (empty($option->matches)) { break; }
               $outputvalue = preg_replace($option->matches, $option->output, $outputvalue);
-              if (is_null($outputvalue)) { oops("incorrect regexp '{$option->matches}'"); }
+              if (is_null($outputvalue)) { self::oops("incorrect regexp '{$option->matches}'"); }
               break;
             case 'replaceString':
               if (empty($option->matches)) { break; }
@@ -429,8 +451,10 @@ class jcomma {
         /* abandon the record if any field condition is met */
         foreach($record->unless as $unless) {
           $unlessvalue = ! isset($unless->value) ? '' : $unless->value;
+          error_log($unlessvalue);
+          error_log($unless->condition);
           if ($this->meetscondition($unless->condition, $unlessvalue,
-                                    $this->dotted($outputrecord, $unless->name))) { continue 2; }
+                                    $this->dotted($outputrecord, $unless->field))) { continue 2; }
         }
         
         /* abandon the record if any ignore row condition based on field is met */

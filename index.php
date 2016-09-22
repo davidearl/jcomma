@@ -168,8 +168,10 @@
 			<option value='nomatch' furtheroptions='cignorerowsvalue'>does not match regular expression</option>
 			<option value='eq' furtheroptions='cignorerowsvalue'>equal to</option>
 			<option value='ne' furtheroptions='cignorerowsvalue'>not equal to</option>
-			<option value='ge' furtheroptions='cignorerowsvalue'>greater or equal to</option>
-			<option value='le' furtheroptions='cignorerowsvalue'>less or equal to</option>
+            <option value='ge' furtheroptions='cignorerowsvalue'>greater or equal to:</option>
+            <option value='le' furtheroptions='cignorerowsvalue'>less or equal to:</option>
+            <option value='before' furtheroptions='cignorerowsvalue'>before (date):</option>
+            <option value='after' furtheroptions='cignorerowsvalue'>after (date):</option>
 		  </select>
 		  <input type='text' class='cignorerowsvalue cinitiallyhidden cfurtheroption cinput2' name='value' placeholder='value to compare with'>
 		  <a class='chelp cinfo' href='help.php?a=hconditions'></a>
@@ -210,6 +212,8 @@
 		  <option value='ne' furtheroptions='crecordifvalue'>not equal to</option>
 		  <option value='ge' furtheroptions='crecordifvalue'>greater or equal to</option>
 		  <option value='le' furtheroptions='crecordifvalue'>less or equal to</option>
+          <option value='before' furtheroptions='crecordifvalue'>before (date):</option>
+          <option value='after' furtheroptions='crecordifvalue'>after (date):</option>
 		</select>
 		<input type='text' class='crecordifvalue cinitiallyhidden cfurtheroption cinput3' name='value' placeholder='value to compare with'> <a class='chelp cinfo' href='help.php?a=hconditions'></a>
 	  </div>
@@ -287,6 +291,8 @@
 			  <option value='ne' furtheroptions='cfieldoptionvalue'>not equal to</option>
 			  <option value='ge' furtheroptions='cfieldoptionvalue'>greater or equal to</option>
 			  <option value='le' furtheroptions='cfieldoptionvalue'>less or equal to</option>
+              <option value='before' furtheroptions='cfieldoptionvalue'>before (date):</option>
+              <option value='after' furtheroptions='cfieldoptionvalue'>after (date):</option>
 			</select> 
 			<input type='text' class='cfieldoptionvalue cinitiallyhidden cfurtheroption cinput4' name='value' value='' placeholder='compared with'>
 		  </div>

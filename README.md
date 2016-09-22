@@ -272,6 +272,8 @@ As well as [restoring them](#hloadsettings) to the page, saved settings can be u
 * ***not equal to*** (`"condition": "ne", "value": "whatever"` [in the spec](#hspec)): if the value is not the same as that given. Comparison as for 'equal to'.
 * ***greater or equal to*** (`"condition": "ge", "value": 123` [in the spec](#hspec)): the value is >= that given this only makes sense for numbers, so both input and output values are first converted to numbers if necessary, and then compared as numbers.
 * ***less or equal to*** (`"condition": "le", "value": 123` [in the spec](#hspec)): <= - numerically, as for 'greater or equal to'.
+* ***before (date)*** (`"condition": "before", "value": "2016-09-23"` [in the spec](#hspec)): date comparison - both the date entered and the date being compared must not contain '/', that is must not be ambiguous. In the case of fields, you can always convert to ISO and then convert to another format after comparison, but ignoring rows is only possible for non-ambiguous dates.
+* ***after (date)*** (`"condition": "after", "value": "2016-09-23"` [in the spec](#hspec)): date comparison, as "before".
 
 (#hregularexpression)
 ### Regular expressions
