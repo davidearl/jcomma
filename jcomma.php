@@ -1,5 +1,7 @@
 <?php
 
+ini_set('default_charset', 'utf-8');
+
 include_once('jcomma.class.php');
 
 function oops($s) { throw new Exception($s); }

@@ -277,7 +277,7 @@
 			<option value='omitIf' furtheroptions='cfieldoptioncondition'>omit field if:</option>
 			<option value='errorOnValue' furtheroptions='cfieldoptioncondition'>stop with error if value: </option>
 		  </select>
-		  <input type='text' class='cfieldoptioncurrencies cinitiallyhidden cfurtheroption cinput4' name='currencies' value='&pound;&dollar;&yen;&euro;' placeholder='list of currency symbols'>
+		  <input type='text' class='cfieldoptioncurrencies cinitiallyhidden cfurtheroption cinput4' name='currencies' value='&pound;&dollar;&yen;&euro;,' placeholder='list of currency symbols'>
 		  <input type='text' class='cfieldoptioninputstring cinitiallyhidden cfurtheroption cinput4' name='matches' value='' placeholder='string to replace'>
 		  <input type='text' class='cfieldoptioninputregexp cinitiallyhidden cfurtheroption cinput4' name='matches' value='' placeholder='regexp'>
 		  <input type='text' class='cfieldoptionoutput cinitiallyhidden cfurtheroption cinput4' name='output' value='' placeholder='replacement'>

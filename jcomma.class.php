@@ -278,6 +278,36 @@ class jcomma {
       return FALSE;
     }
   }
+
+  function asutf8($row /* array of cells (strings) */) {
+    if (! isset($this->encoding)) {        
+      if (empty($this->spec->encoding)) { $this->spec->encoding = 'auto'; }
+      if ($this->spec->encoding != 'auto') {
+        $this->encoding = $this->spec->encoding;
+      } else {
+        $topbitset = FALSE;
+        $s = implode(' ', $row);
+        for($i = 0; $i < strlen($s); $i++) {
+          if (ord($s[$i]) & 0x80) {
+            $topbitset = TRUE;
+            break;
+          }
+        }
+        if ($topbitset) {
+          $encoding = mb_detect_encoding($s, array('UTF-8', 'ASCII', 
+            'ISO-8859-1', 'ISO-8859-2', 'ISO-8859-3', 'ISO-8859-4', 'ISO-8859-5', 
+            'ISO-8859-6', 'ISO-8859-7', 'ISO-8859-8', 'ISO-8859-9', 'ISO-8859-10', 
+            'ISO-8859-13', 'ISO-8859-14', 'ISO-8859-15', 'ISO-8859-16', 
+            'Windows-1251', 'Windows-1252', 'Windows-1254'));
+          if (empty($encoding)) { self::oops("unable to detect CSV's encoding - choose one explicitly"); }
+        }
+      }
+    }
+    if (isset($this->encoding) && $this->encoding != 'UTF-8' && $this->encoding != 'ASCII') {
+      for ($i = 0; $i < count($row); $i++) { $row[$i] = iconv($this->encoding, 'UTF-8', $row[$i]); }
+    }
+    return $row;
+  }
   
   function readrows($n, $exact=FALSE){
     $rows = array();
@@ -300,11 +330,7 @@ class jcomma {
           }
         }
       }
-      $encoding = $this->spec->encoding == 'auto' ? mb_detect_encoding(implode(' ', $row)) : $this->spec->encoding;
-      if ($encoding != 'UTF-8' && $encoding != 'ASCII') {
-        for($ie = 0; $ie < count($row); $ie++) { $row[$ie] = iconv($encoding, 'UTF-8', $row[$ie]); }
-      }
-      $rows[] = $row;
+      $rows[] = $this->asutf8($row);
     }
     return $rows;
   }
@@ -451,8 +477,6 @@ class jcomma {
         /* abandon the record if any field condition is met */
         foreach($record->unless as $unless) {
           $unlessvalue = ! isset($unless->value) ? '' : $unless->value;
-          error_log($unlessvalue);
-          error_log($unless->condition);
           if ($this->meetscondition($unless->condition, $unlessvalue,
                                     $this->dotted($outputrecord, $unless->field))) { continue 2; }
         }
@@ -498,6 +522,7 @@ class jcomma {
                'Content-disposition: attachment; filename="'.str_replace('.csv', ".{$this->spec->outputFormat}",
                                                                          $inputfilename).'"');
       header('Content-Transfer-Encoding: binary');
+      header("X-Comment-Original-CSV-Encoding: {$this->encoding}");
       ob_end_flush();
     }
 
