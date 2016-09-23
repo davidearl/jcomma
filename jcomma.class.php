@@ -26,11 +26,11 @@ class jcomma {
     if (strlen($l) == 0) { self::oops('invalid column letter'); }
     if (strlen($l) == 1) {
       $n = strpos(self::$alphabet, $l);
-      if ($n === FALSE) { self::oops('invalid column letter'); }
+      if ($n === FALSE) { self::oops('invalid column letter: '.$l); }
       return $n;
     }
     $n1 = strpos(self::$alphabet, $l[0]);
-    $n1 = strpos(self::$alphabet, $l[1]);
+    $n2 = strpos(self::$alphabet, $l[1]);
     if ($n1 === FALSE || $n2 == FALSE) { self::oops('invalid column letter: '.$l); }
     return $n1 * 26 + $n2;
   }
@@ -354,6 +354,14 @@ class jcomma {
     if ($this->spec->headerRows > 0) {
       $rows = $this->readrows($this->spec->headerRows, TRUE /* exactly that number, don't ignore any rows */);
       if (empty($rows)) { self::oops('nothing useful in file except possibly headers'); }
+      /* there may be a byte order mark, and fgetcsv seems to ignore this */
+      if (count($rows[0]) > 0 && substr($rows[0][0], 0, 3) == "\xef\xbb\xbf" /* BOM */) {
+        $rows[0][0] = substr($rows[0][0], 3);
+        /* and it may also have left quotes because of this... */
+        if (strlen($rows[0][0]) >=2 && $rows[0][0][0] == '"') {
+          $rows[0][0] = str_replace('""', '"', substr($rows[0][0], 1, strlen($rows[0][0])-2));
+        }
+      }
       for ($i = 0; $i < count($rows[$this->spec->headerRows-1]); $i++) {
         $this->headings[strtoupper($rows[$this->spec->headerRows-1][$i])] = $this->columnletter($i);
       }
