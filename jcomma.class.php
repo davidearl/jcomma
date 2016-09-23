@@ -300,6 +300,7 @@ class jcomma {
             'ISO-8859-13', 'ISO-8859-14', 'ISO-8859-15', 'ISO-8859-16', 
             'Windows-1251', 'Windows-1252', 'Windows-1254'));
           if (empty($encoding)) { self::oops("unable to detect CSV's encoding - choose one explicitly"); }
+          if ($encoding != 'UTF-8' && $encoding != 'ASCII') { $this->encoding = $encoding; }
         }
       }
     }
