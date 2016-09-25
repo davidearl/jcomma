@@ -422,8 +422,9 @@ class jcomma {
               $outputvalue = trim($outputvalue);
               break;
             case 'bookkeepersNegative':
-              $outputvalue = preg_replace('~^\\([0-9\\.]*)\\)$~', '-$1', $outputvalue);
+              $outputvalue = preg_replace('~^\\(([0-9\\.]*)\\)$~', '-$1', $outputvalue);
               $outputvalue = preg_replace('~^([0-9\\.]*)-$~', '-$1', $outputvalue);
+              $outputvalue = preg_replace('~^([0-9\\.]*)\\+$~', '$1', $outputvalue);
               break;
             case 'omitIf':
                 if (empty($option->condition)) { break; }
@@ -531,7 +532,7 @@ class jcomma {
                'Content-disposition: attachment; filename="'.str_replace('.csv', ".{$this->spec->outputFormat}",
                                                                          $inputfilename).'"');
       header('Content-Transfer-Encoding: binary');
-      header("X-Comment-Original-CSV-Encoding: {$this->encoding}");
+      if (! empty($this->encoding)) { header("X-Comment-Original-CSV-Encoding: {$this->encoding}"); }
       ob_end_flush();
     }
 
