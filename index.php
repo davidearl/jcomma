@@ -26,17 +26,18 @@
   <hr>
 
   <div>
-	Load settings from file <a class='chelp cinfo' href='help.php?a=hloadsettings'></a>: <input type='file' id='ialoadoptions'>
+    Load settings from file <a class='chelp cinfo' href='help.php?a=hloadsettings'></a>: <input type='file' id='ialoadoptions'><br>
+	Or paste settings here:<br><textarea id='iapasteoptions'></textarea>
   </div>
 
   <div>
 	<a href='#' id='ireset'>reset settings</a> <a class='chelp cinfo' href='help.php?a=hresetsettings'></a>
   </div>
   
-  <div id='iform'>
+  <div id='iform'>	
 	<div class='csection coptions clevel1'>
 	  <label class='clabelheader' for='icomment'>Comment/description:</label> (just for your own information) <a class='chelp cinfo' href='help.php?a=hcomment'></a><br>
-	    <textarea id='icomment' class='cinput1' name='comment'></textarea>	    
+	    <textarea id='icomment' class='cinput1' name='comment'></textarea>
 	</div>
 	
 	<div class='csection coptions clevel1'>
@@ -47,7 +48,7 @@
 	  </select>
 	</div>
 	
-	<div class='csection coptions clevel1'>
+	<div class='csection coptionset coptions clevel1'>
 	  <label class='clabelheader'>Output format:</label> <a class='chelp cinfo' href='help.php?a=houtputformat'></a><br>
 	  <select id='ioutputformat' name='outputFormat' class='cinput1'>
 		<option value='json' selected='selected' furtheroptions='coutputformatjson'>json</option>
@@ -160,7 +161,7 @@
 		  <option value='field'>If field...</option>
 		</select>
 		<input type='text' class='cignorerowsname cinput2' name='name' placeholder='column letter/header or field name'>
-		<div class='cfurtheroptions'>
+		<div class='coptionset cfurtheroptions'>
 		  <select class='cignorerowscondition cinput2' name='condition'>
 			<option value='empty' selected='selected' furtheroptions=''>empty (no text at all)</option>
 			<option value='white' furtheroptions=''>whitespace only or empty</option>
@@ -200,7 +201,7 @@
 	<li class='cproforma clevel3 cgroup crecordsif' id='irecordifproforma' name='unless'>
 	  <button class='cmove cmove3'>&#x2195;</button>
 	  <button class='cremove'>&#x274c;</button>
-	  <div class='coptions cgroup'>
+	  <div class='coptionset coptions cgroup'>
 		<label>if field </label>
 		  <input type='text' class='crecordiffield cinput3' name='field' placeholder='field name'>
 		<select class='crecordifcondition cinput3' name='condition'>
@@ -263,9 +264,9 @@
 	  <button class='cmove cmove4'>&#x2195;</button>
 	  <button class='cremove'>&#x274c;</button>
 	  <div class='coptions cgroup'>
-		<div class='cfurtheroptions'>
+		<div class='coptionset cfurtheroptions'>
 		  <select class='cfieldoptionitem cinput4' name='item'>
-			<option value=''>choose&hellip;</option>
+			<option value='' furtheroptions=''>choose&hellip;</option>
 			<option value='ignoreCurrency' furtheroptions='cfieldoptioncurrencies'>ignore currency symbols as follows</option>
 			<option value='bookkeepersNegative' furtheroptions=''>treat '(1.23)' or '1.23-' as negative: '-1.23'</option>
 			<option value='trim' furtheroptions=''>trim surrounding white space</option>
@@ -274,28 +275,37 @@
 			<option value='convertToNumber' furtheroptions='cfieldoptionconverterror,cfieldoptionnegate'>output as number</option>
 			<option value='convertToDate' furtheroptions='cfieldoptionconverterror,cfieldoptionconvertdateformat,cfieldoptionconverttime'>output as ISO date</option>
 			<option value='convertToCustomDate' furtheroptions='cfieldoptionconverterror,cfieldoptionconvertdateformat,cfieldoptionconvertdatestyle'>output as custom date</option>
-			<option value='omitIf' furtheroptions='cfieldoptioncondition'>omit field if:</option>
-			<option value='errorOnValue' furtheroptions='cfieldoptioncondition'>stop with error if value: </option>
+			<option value='skipIf' furtheroptions='cfieldoptiontest,cfieldoptioncondition'>skip next option if:</option>
+			<option value='skipUnless' furtheroptions='cfieldoptiontest,cfieldoptioncondition'>skip next option unless:</option>
+			<option value='omitIf' furtheroptions='cfieldoptiontest,cfieldoptioncondition'>omit field if:</option>
+			<option value='errorOnValue' furtheroptions='cfieldoptiontest,cfieldoptioncondition'>stop with error if value: </option>
 		  </select>
 		  <input type='text' class='cfieldoptioncurrencies cinitiallyhidden cfurtheroption cinput4' name='currencies' value='&pound;&dollar;&yen;&euro;,' placeholder='list of currency symbols'>
 		  <input type='text' class='cfieldoptioninputstring cinitiallyhidden cfurtheroption cinput4' name='matches' value='' placeholder='string to replace'>
 		  <input type='text' class='cfieldoptioninputregexp cinitiallyhidden cfurtheroption cinput4' name='matches' value='' placeholder='regexp'>
 		  <input type='text' class='cfieldoptionoutput cinitiallyhidden cfurtheroption cinput4' name='output' value='' placeholder='replacement'>
-		  <div class='cfurtheroptions cfieldoptioncondition cinitiallyhidden cfurtheroption'>
+		  <span class='coptionset cfieldoptiontest cinitiallyhidden cfurtheroption'>
+			<select class='cinput4' name='test'>
+			  <option value='value' selected='selected' furtheroptions=''>value</option>
+			  <option value='field' furtheroptions='cfieldoptionfield'>earlier field</option>			  
+			</select>
+			<input type='text' class='cfieldoptionfield cinitiallyhidden cfurtheroption cinput4' name='field' value='' placeholder='field name'>
+		  </span>
+		  <span class='coptionset cfieldoptioncondition cinitiallyhidden cfurtheroption'>
 			<select class='cinput4' name='condition'>
-			  <option value='empty' selected='selected' furtheroptions=''>empty (no text at all)</option>
-			  <option value='white' furtheroptions=''>whitespace only or empty</option>
+			  <option value='empty' selected='selected' furtheroptions=''>is empty (no text at all)</option>
+			  <option value='white' furtheroptions=''>is whitespace only or empty</option>
 			  <option value='match' furtheroptions='cfieldoptionvalue'>matches regular expression</option>
 			  <option value='nomatch' furtheroptions='cfieldoptionvalue'>does not match regular expression</option>
 			  <option value='eq' furtheroptions='cfieldoptionvalue'>equal to</option>
 			  <option value='ne' furtheroptions='cfieldoptionvalue'>not equal to</option>
 			  <option value='ge' furtheroptions='cfieldoptionvalue'>greater or equal to</option>
 			  <option value='le' furtheroptions='cfieldoptionvalue'>less or equal to</option>
-              <option value='before' furtheroptions='cfieldoptionvalue'>before (date):</option>
-              <option value='after' furtheroptions='cfieldoptionvalue'>after (date):</option>
+              <option value='before' furtheroptions='cfieldoptionvalue'>is before (date):</option>
+              <option value='after' furtheroptions='cfieldoptionvalue'>is after (date):</option>
 			</select> 
 			<input type='text' class='cfieldoptionvalue cinitiallyhidden cfurtheroption cinput4' name='value' value='' placeholder='compared with'>
-		  </div>
+		  </span>
 		  <input type='text' class='cfieldoptionconvertdatestyle cinitiallyhidden cfurtheroption cinput4' name='dateFormatStyle' value='' placeholder='date style'>
 		  <span class='cfieldoptionconverterror cinitiallyhidden cfurtheroption'>
 			<input type='checkbox' class='cinput4' name='errorOnType' value='true'> stop on conversion error
@@ -316,23 +326,33 @@
 	<li class='cproforma cgroup clevel4 cfieldscomprising' id='ifieldcomprisingproforma' name='comprising'>
 	  <button class='cmove cmove4'>&#x2195;</button>
 	  <button class='cremove'>&#x274c;</button>
-	  <div class='coptions cgroup'>
+	  <div class='coptionset coptions cgroup'>
 		<select class='cfieldoptionitem cinput4' name='item'>
 		  <option value=''>choose&hellip;</option>
-		  <option value='column' furtheroptions='cfieldcomprisingcolumn,cfieldcomprisingrowoffset'>column (letter or header):</option>
+		  <option value='column' furtheroptions='cfieldcomprisingcolumn,cfieldappend'>column (letter or header):</option>
+		  <option value='field' furtheroptions='cfieldcomprisingfield,cfieldappend'>earlier field (in this record):</option>
 		  <option value='text' furtheroptions='cfieldcomprisingtext'>verbatim text:</option>
 		</select>
-		<input type='text' class='cfieldcomprisingcolumn cinitiallyhidden cfurtheroption cinput4' name='column' value='' placeholder='column letter/header'>
-		<span class='cinitiallyhidden cfurtheroption cfieldcomprisingrowoffset'>row offset: 
+		<span class='cinitiallyhidden cfurtheroption cfieldcomprisingcolumn'>
+		  <input type='text' class='cinput4' name='column' value='' placeholder='column letter/header'>
+		  row offset: 
 		  <input type='text' class='cinput4 cshortinput cint' name='rowOffset' pattern='[0-9]*' value='' placeholder='row offset'>
 		</span>
 		<input type='text' class='cfieldcomprisingtext cinitiallyhidden cfurtheroption cinput4' name='text' value='' placeholder='text to include'>
+		<span class='cinitiallyhidden cfurtheroption cfieldcomprisingfield'>
+		  <input type='text' class='cinput4' name='field' value='' placeholder='field name'>
+		</span>
+		<span class='cinitiallyhidden cfurtheroption cfieldappend'>
+		  <input type='checkbox' class='cinput4' name='appendComma' value='true'> append comma
+		  <input type='checkbox' class='cinput4' name='appendSpace' value='true'> append space
+		</span>
 	  </div>
 	</li>
   </ul>
 	
   <div>
-	<a id='iasaveoptions'>save settings to file</a> <a class='chelp cinfo' href='help.php?a=hsavesettings'></a>
+	<a id='iasaveoptions'>save settings to file</a> <a class='chelp cinfo' href='help.php?a=hsavesettings'></a><br>
+	or copy settings from here:<br><textarea id='iacopyoptions' readonly></textarea>
   </div>
 
   <div id='ihelp'>

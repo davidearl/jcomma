@@ -31,8 +31,8 @@ $(function(){
 		var jself = $(this);		
 		var f = jself.find("option:selected").attr("furtheroptions");
 		if (typeof f != "string") { return; }
-		var jparent = jself.closest("div");
-		jparent.find(".cfurtheroption").not(jself).hide();
+		var jparent = jself.closest(".coptionset");
+		jparent.children(".cfurtheroption").not(jself).hide();
 		if (f == "") { return; }
 		f.split(",").forEach(function(el,idx){ jparent.find("."+el).show(); });		
 	});
@@ -115,8 +115,8 @@ $(function(){
 			var js = j.find("select").filter("[name=\""+k+"\"]").val(v).show();
 			var f = js.find("option:selected").attr("furtheroptions");
 			if (typeof f == "string") {
-				var jparent = js.closest("div");
-				jparent.find(".cfurtheroption").hide();
+				var jparent = js.closest(".coptionset");
+				jparent.children(".cfurtheroption").hide();
 				if (f != "") { f.split(",").forEach(function(el,idx){ jparent.find("."+el).show(); }); }
 			}
 			j.find("input[type=text],textarea").filter("[name=\""+k+"\"]").val(v).show();
@@ -126,12 +126,15 @@ $(function(){
 
 	function makespec(){
 		/* capture the form content and return as a JSON string (we may save this to a file or localStorage) */
-		return JSON.stringify(recurse(1, $("#iform .coptions")));
+		var data = recurse(1, $("#iform .coptions"));
+		data.specVersion = 1;
+		return JSON.stringify(data);
 	}
 
 	function savespec() {
 		/* save to localStorage on each change */
 		localStorage.spec = makespec();
+		$("#iacopyoptions").val(localStorage.spec);
 	}
 	
 	function loadspec(spec){
@@ -142,6 +145,7 @@ $(function(){
 		$.each(spec, function(k, v){ populate(k, v, $("#iform")); });
 		toggleqif();
 		sorting();
+		$("#iacopyoptions").val(localStorage.spec);
 	}
 	
 	$("#ialoadoptions").change(function(e1){
@@ -158,6 +162,16 @@ $(function(){
 		}
 	});
 
+	$("#iapasteoptions").change(function(e1){
+		/* load spec from contents */		
+		loadspec($(this).val());
+		$(this).val("done")
+	});
+
+	$("#iacopyoptions,#iapasteoptions").focus(function(){
+		$(this).select();
+	});
+	
 	$("#icsv").change(function(e){
 		$(".cfilewarning").toggle($(this).val() == "");
 	});

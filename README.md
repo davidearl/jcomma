@@ -63,9 +63,11 @@ The result is written to standard output. spec.json is the file containing a jso
     echo my.csv | php jcomma.php -s spec.json > my.xml
 
 (#hloadsettings)
-## Load settings from file
+## Load settings
 
 You can load all the settings previously saved with the link at the bottom of the page (or prepared elswhere) by opening the JSON file with the **choose file** button here. In Chrome you can just drop the file onto the button.
+
+Alternatively, copy the JSON and paste it into the box provided.
 
 (#hresetsettings)
 ## Reset settings
@@ -73,7 +75,6 @@ You can load all the settings previously saved with the link at the bottom of th
 Clicking this just resets the page to the simplest possible settings for you to then exand on (it may be needed since the page remembers each change).
 
 ## Output settings
-
 
 (#hcomment)
 ### Comment
@@ -214,11 +215,17 @@ You can usefully have more than one field with the same name (usually consecutiv
 (#hcomprising)
 ### Field concatenated from
 
-Concatenate several columns, interleaved with verbatim separators, to make one output field, before applying any options. For example, some banks provide several fields which one might usefully put into a single Description field. You would almost always need at least one column.
+Concatenate several columns, interleaved with verbatim separators, to make one output field, before applying any options. For example, some banks provide several fields which one might usefully put into a single Description field. You would almost always need at least one column. (`"comprising": [{"item": "column", "column": "A", ...}, ...]` [in the spec](#hspec)
 
 Where there is more than one input row ([rowCount](#hrowcount) is greater than 1), you'll need to say from which of those rows the CSV cell is obtained (this also allows you to concatenate several values vertically from the same column), by giving the row offset (0 for the first row, 1 for the second in each group of rows, and  so on).
 
-Click + to include a new column or text, X to remove one, and drag &#x2195; to change the order
+You can also include verbatim text, for example to parenthesis a second column. (`"comprising": [{"item": "text", "text": "whatever text"}, ...]` [in the spec](#hspec)).
+
+You can also include another field as a source for this field. However, it must be a field defined earlier in the record: fields are computed in order, so later fields are not available at this point. (`"comprising": [{"item": "field", "field": "name", ...}, ...]` [in the spec](#hspec)).
+
+For fields and columns, check boxes are available to append comma (`"appendComma": true` [in the spec](#hspec)), space (`"appendSpace": true` [in the spec](#hspec)) or both. This is jsut a shortcut for including these as verbatim text.
+
+Click + to include a new column, field or text, X to remove one, and drag &#x2195; to change the order
 
 (#hoptions)
 ### Field options
@@ -243,9 +250,13 @@ Available options are as follows:
 
 * ***output as custom date*** (`"item": "convertToCustomDate", "errorOnType": true, "dateFormatUS": true, "dateFormatStyle": "j M Y"` [in the spec](#hspec)): Similar to ISO date, but you can specify the output style yourself (including time parts). This uses the [PHP date function](http://php.net/manual/en/function.date.php) in which letters in the date style are replaced by parts of the date or time. For example "M j, Y" produces dates like "Dec 1, 2016" because M means the abbreviated month name, j means the day without leading zeros and Y means the four digit year. Many other variants are possible - see [date](http://php.net/manual/en/function.date.php).
 
-* ***omit field if...*** (`"item": "omitIf", "condition": "...", ...` [in the spec](#hspec)): Having transformed the field by whatever other methods, the result can be discarded completely if the [condition](#hcondition) selected here is satisifed. Omiting a field is potentially useful in JSON and XML formats, but in tabular formats (CSV, HTML, XLSX) this would result in columns shifting left by one, so it would be better to transform (above) to an empty string value instead.
+* ***omit field if...*** (`"item": "omitIf", "condition": "...", ...` [in the spec](#hspec)): Having transformed the field by whatever other methods, the result can be discarded completely if the [condition](#hcondition) selected here is satisifed. Omiting a field is potentially useful in JSON and XML formats, but in tabular formats (CSV, HTML, XLSX) this would result in columns shifting left by one, so it would be better to transform (above) to an empty string value instead. Note that when a field is omitted, no further options are applied for it, but it is not actually discarded until all the fields have been computed. This means that an omitted field can be used by later fields in concatenation or conditions, which means it can act rather like a variable.
+
+* ***skip next option if...*** and ***skip next option unless...*** (`"item": "skipIf", "condition": "...", ...` or `"item": "Unless", "condition": "...", ...` [in the spec](#hspec)): The following option can be applied or not depending on the outcome of this [condition](#hcondition).
 
 * ***stop with error if value...*** (`"item": "errorOnValue", "condition": "...", ...` [in the spec](#hspec)): Having transformed the field by whatever other methods, the whole conversion process can be terminated if the [condition](#hcondition) selected here is satisifed: for example if an unexpected value is encountered.
+
+Each of the condition options (skip, omit and stop) can use either the currently computed value for the field from the earlier steps (`"test": "value"` [in the spec](#hspec)), or the value of any earlier field (`"test": "field", "field": "name"` [in the spec](#hspec)), to compare with the value given.
 
 (#hunless)
 ### Don't output record...
@@ -253,9 +264,11 @@ Available options are as follows:
 Having calculated all the fields for a record, the values computed can be used to determine that their record should not be included in the output at all if any of the [conditions](#hconditions) given here are satisfied. Press + to add a new condition, X to remove an existing one, and drag &#x2195; to change the order.
 
 (#hsavesettings)
-## Save settings to file
+## Save settings
 
 All the settings described in the form are saved as a jcomma specification, a JSON file, to a local file. Note that settings are saved on every change so if the page is reloaded, changes are not lost.
+
+Alternatively copy the JSON from the box provided to where you need it.
 
 As well as [restoring them](#hloadsettings) to the page, saved settings can be used in automated workflows using jcomma, so that the specifications do not need to be hand written in JSON.
 
@@ -298,6 +311,7 @@ The values entered into the form are turned into a JSON object. This can be [sav
 When used from the [API](#huseapi), as a [library](#huselibrary), or in a [shell command](#huseshell), the specification is supplied in this structured form. (Yes, I know JSON can't really have comments like this).
 
     {
+        "specVersion": 2, # always 2 for these options
         "outputFormat": "json", # csv, html, xlsx, xml
         "outputStyle": "pretty", # for json
         "outputBulkElastic": "true", # for json, any non empty value
@@ -320,9 +334,18 @@ When used from the [API](#huseapi), as a [library](#huselibrary), or in a [shell
                         "comprising": [
                             {"item": "column",
                              "column": "A",
-                             "rowOffset": 0 # optional, N=0 by default, otherwise from row relative to current from the N specified for the record in rowCount
+                             "rowOffset": 0, # optional, N=0 by default, otherwise from row relative to current from the N specified for the record in rowCount
+                             "appendComma": true,
+                             "appendSpace": true # comma first if both set
                             },
-                            {"item": "text", "text": "whatever"},
+                            {"item": "text",
+                             "text": "whatever"
+                            },
+                            {"item": "field",
+                             "field": "name",
+                             "appendComma": true,
+                             "appendSpace": true # comma first if both set
+                            },
                             ...
                         ],
                         "options": [ # any of the following, evaluated in turn:
@@ -334,13 +357,19 @@ When used from the [API](#huseapi), as a [library](#huselibrary), or in a [shell
                             {"item": "convertToNumber", "errorOnType": true, "negate": true}, # any non blank value ok for options
                             {"item": "convertToDate", "errorOnType": true, "dateFormatUS": true, "dateFormatTime": true},
                             {"item": "convertToCustomDate", "errorOnType": true, "dateFormatUS": true, "dateFormatStyle": "j M Y"}, # per PHP date function
-                            {"item": "omitIf", "condition": "match", "value": "..."},
-                            {"item": "errorOnValue", "condition": "match", "value": "..."} # match, eq etc, blank, white, nonNumeric
+                            {"item": "omitIf", "test": "value", "condition": "match", "value": "..."},
+                            {"item": "omitIf", "test": "field", "field": "name", "condition": "match", "value": "..."},
+                            {"item": "skipIf", "test": "value", "condition": "match", "value": "..."},
+                            {"item": "skipIf", "test": "field", "field": "name", "condition": "match", "value": "..."},
+                            {"item": "skipUnless", "test": "value", "condition": "match", "value": "..."},
+                            {"item": "skipUnless", "test": "field", "field": "name", "condition": "match", "value": "..."},
+                            {"item": "errorOnValue", "test": "value", "condition": "match", "value": "..."} # match, eq etc, blank, white, nonNumeric
+                            {"item": "errorOnValue", "test": "field", "field": "name", "condition": "match", "value": "..."} # match, eq etc, blank, white, nonNumeric
                         ]
                     } ,
                     ... # more fields
                 ],
-                "unless": [ # generate record from row unless condition is true
+                "unless": [ # generate record from row unless any condition is true
                     { "field": "name", "condition": "eq", "value": "..."},
                     ... # more 'unless' conditions, record discarded if any is true
                 ]
@@ -352,7 +381,7 @@ When used from the [API](#huseapi), as a [library](#huselibrary), or in a [shell
 (#hinstallation)
 ## Installation
 
-Requires PHP >= 5.4. Does not work on older browsers (it's using a recent version of jQuery).
+Requires PHP >= 5.4. Does not work on older browsers (it's using a recent version of jQuery). It will probably work on PHP 5.3 except for JSON Pretty Print which would produce a warning in the server error log if used.
 
 Just put the files in the document root of your web server, ideally a https website, or as a sub-directory of a website.
 
@@ -360,7 +389,10 @@ You might want to increase the individual file and total file upload limits in y
 
 ## Acknowledgments
 
-Apart from PHP and server software, the only dependencies are [PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter) for the xlsx file format output, licensed under the MIT license, and [jQuery](https://jquery.com/) and [jQuery UI](https://jqueryui.com/), also MIT license.
+Apart from PHP and server software, the only dependencies are
+* [PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter) for the xlsx file format output, licensed under the MIT license, and
+* [jQuery](https://jquery.com/) and [jQuery UI](https://jqueryui.com/), also MIT license.
+
 
 
 

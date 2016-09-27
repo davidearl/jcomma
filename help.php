@@ -49,7 +49,6 @@ function getParameterByName(name) {
 }
 $(function(){
 	var anchor = getParameterByName('a');
-	console.log(anchor);
 	if (anchor) {
 		var ji = $("[name=\""+anchor+"\"]");
 		if (ji) {

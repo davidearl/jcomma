@@ -1,5 +1,7 @@
 <?php
 
+define ("CURRENT_VERSION", 2);
+
 class jcomma {
 
   function __construct($path, $spec) {
@@ -163,6 +165,10 @@ class jcomma {
   }
   
   function validate(){
+    $this->checkint(array('specVersion'), 1, 1);
+    if ($this->spec->specVersion > CURRENT_VERSION) {
+      $this->oops("The server version ".CURRENT_VERSION." predates the spec version ({$this->spec->specVersion}) supplied");
+    }
     $this->checkstring(array('outputFormat'),
                        array('json','csv', 'html', 'xlsx', 'xml', 'qif'),
                        FALSE, 'jsonarray');
@@ -198,10 +204,16 @@ class jcomma {
         $this->checkstring(array('records', $ir, 'fields', $if, 'name'));        
         $options = $this->checkarray(array('records', $ir, 'fields', $if, 'options'), array());
         for($io = 0; $io < count($options); $io++) {
+          $test = $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'test'),
+                                     array('value','field'), TRUE, 'value');
+          if ($test == 'field') {
+            $field = $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'field'));
+          }
+
           $item = $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'item'),
                                      array('ignoreCurrency','replaceRegExp','replaceString','trim',
-                                           'bookkeepersNegative',
-                                           'omitIf','convertToNumber','convertToDate', 'convertToCustomDate',
+                                           'bookkeepersNegative','skipIf','skipUnless','omitIf',
+                                           'convertToNumber','convertToDate', 'convertToCustomDate',
                                            'errorOnValue'));
           switch($item) {
           case 'ignoreCurrency':
@@ -212,6 +224,8 @@ class jcomma {
             $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'matches'));
             $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'value'), NULL, TRUE, '');
             break;
+          case 'skipIf':
+          case 'skipUnless':
           case 'omitIf':
             $this->checkcondition(array('records', $ir, 'fields', $if, 'options', $io, 'condition'));
             break;
@@ -228,7 +242,7 @@ class jcomma {
         }
         for ($ic = 0; $ic < count($comprising); $ic++) {
           $item = $this->checkstring(array('records', $ir, 'fields', $if, 'comprising', $ic, 'item'),
-                                     array('column', 'text'));
+                                     array('column', 'text', 'field'));
           switch($item){
           case 'column':
             $this->checkstring(array('records', $ir, 'fields', $if, 'comprising', $ic, 'column'));
@@ -236,6 +250,9 @@ class jcomma {
             break;
           case 'text':
             $this->checkstring(array('records', $ir, 'fields', $if, 'comprising', $ic, 'text'));          
+            break;
+          case 'field':
+            $this->checkstring(array('records', $ir, 'fields', $if, 'comprising', $ic, 'field'));          
             break;
           }          
         }        
@@ -276,6 +293,19 @@ class jcomma {
       return strtotime($vcsv) > strtotime($vspec);
     default:
       return FALSE;
+    }
+  }
+  
+  function comparevalue($option, $outputvalue, $outputrecord) {
+    $test = empty($option->test) ? 'value' : $option->test;
+    switch($test) {
+    case 'field':
+      if (! isset($outputrecord->{$option->field})) {
+        $this->oops("at row {$this->currentrow}, {$option->field} is not a previous field in the same record");
+      }
+      return $outputrecord->{$option->field};
+    case 'value':
+      return $outputvalue;
     }
   }
 
@@ -377,7 +407,8 @@ class jcomma {
       foreach($this->spec->records as $record) {
 
         $outputrecord = new stdClass();
-          
+        $omitfields = array();
+        
         foreach ($record->fields as $field) {
 
           /* calculate outputvalue for field according to 'comprising' */
@@ -394,12 +425,23 @@ class jcomma {
             case 'text':
               $outputvalue .= $comprising->text;
               break;
+            case 'field':
+              if (! isset($outputrecord->{$comprising->field})) { $this->oops("at row {$this->currentrow}, {$comprising->field} is not a previous field in the same record"); }
+              $outputvalue .= $outputrecord->{$comprising->field};
+              break;
             }
+            if (! empty($comprising->appendComma)) { $outputvalue .= ','; }
+            if (! empty($comprising->appendSpace)) { $outputvalue .= ' '; }
           }
 
           /* apply options */
+          $omitnextoption = FALSE;
           foreach($field->options as $option) {
             if (! isset($option->item)) { continue; }
+            if ($omitnextoption) {
+              $omitnextoption = FALSE;
+              continue;
+            }
             switch($option->item){
             case 'ignoreCurrency':
               if (empty($option->currencies)) { break; }
@@ -426,17 +468,40 @@ class jcomma {
               $outputvalue = preg_replace('~^([0-9\\.]*)-$~', '-$1', $outputvalue);
               $outputvalue = preg_replace('~^([0-9\\.]*)\\+$~', '$1', $outputvalue);
               break;
+            case 'skipIf':
+                if (empty($option->condition)) { break; }
+                if ($this->meetscondition($option->condition,
+                                          empty($option->value) ? '' : $option->value,
+                                          $this->comparevalue($option, $outputvalue, $outputrecord)))
+                {
+                  $omitnextoption = TRUE;
+                }
+                break;
+            case 'skipUnless':
+                if (empty($option->condition)) { break; }
+                if (! $this->meetscondition($option->condition,
+                                          empty($option->value) ? '' : $option->value,
+                                          $this->comparevalue($option, $outputvalue, $outputrecord)))
+                {
+                  $omitnextoption = TRUE;
+                }
+                break;
             case 'omitIf':
                 if (empty($option->condition)) { break; }
-                $optionvalue = ! isset($option->value) ? '' : $option->value;
-                if ($this->meetscondition($option->condition, $optionvalue, $outputvalue)) {
-                  continue 3;
+                if ($this->meetscondition($option->condition,
+                                          empty($option->value) ? '' : $option->value,
+                                          $this->comparevalue($option, $outputvalue, $outputrecord)))
+                {
+                  $omitfields[$field->name] = TRUE;
+                  continue 2;
                 }
                 break;
             case 'errorOnValue':
                 if (empty($option->condition)) { break; }
-                $optionvalue = ! isset($option->value) ? '' : $option->value;
-                if ($this->meetscondition($option->condition, $optionvalue, $outputvalue)) {
+                if ($this->meetscondition($option->condition,
+                                          empty($option->value) ? '' : $option->value,
+                                          $this->comparevalue($option, $outputvalue, $outputrecord)))
+                {
                   $this->oops("at row {$this->currentrow}, {$outputvalue}, failed errorOnValue check)");
                 }
                 break;
@@ -499,7 +564,8 @@ class jcomma {
                                     $this->dotted($outputrecord, $ignoreRow->name))) { continue 2; }
         }
         
-        /* if everything is OK, finally, save the new record */
+        /* if everything is OK, save the new record, omitting any fields requested */
+        foreach($omitfields as $omitfield => $true) { unset($outputrecord->$omitfield); }
         $output[] = $outputrecord;
       }
     }
