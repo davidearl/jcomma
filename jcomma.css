@@ -208,3 +208,8 @@ a {
 	position: relative;
 	top: 5px;
 }
+
+#iapasteoptions,#iacopyoptions {
+	width: 40%;
+	height: 1.8em;
+}
