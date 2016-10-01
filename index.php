@@ -247,6 +247,7 @@
 		  <option value='O'>O: Commission cost</option>
 		  <option value='$'>$: Amount transferred</option>
 		</select>
+        <input type='checkbox' name='exclude' class='cinput3' value='true'> don't include in output
 		<br>
 		<label class='clabelheader'>Field concatenated from:</label>
 		  <a class='chelp cinfo' href='help.php?a=hcomprising'></a><br>
@@ -270,8 +271,8 @@
 			<option value='ignoreCurrency' furtheroptions='cfieldoptioncurrencies'>ignore currency symbols as follows</option>
 			<option value='bookkeepersNegative' furtheroptions=''>treat '(1.23)' or '1.23-' as negative: '-1.23'</option>
 			<option value='trim' furtheroptions=''>trim surrounding white space</option>
-			<option value='replaceString' furtheroptions='cfieldoptioninputstring,cfieldoptionoutput'>replace all occurences of string</option>
-			<option value='replaceRegExp' furtheroptions='cfieldoptioninputregexp,cfieldoptionoutput'>replace using regular expression:</option>
+			<option value='replaceString' furtheroptions='cfieldoptioninputmatch,cfieldoptionoutput'>replace all occurences of string</option>
+			<option value='replaceRegExp' furtheroptions='cfieldoptioninputmatch,cfieldoptionoutput'>replace using regular expression:</option>
 			<option value='convertToNumber' furtheroptions='cfieldoptionconverterror,cfieldoptionnegate'>output as number</option>
 			<option value='convertToDate' furtheroptions='cfieldoptionconverterror,cfieldoptionconvertdateformat,cfieldoptionconverttime'>output as ISO date</option>
 			<option value='convertToCustomDate' furtheroptions='cfieldoptionconverterror,cfieldoptionconvertdateformat,cfieldoptionconvertdatestyle'>output as custom date</option>
@@ -281,15 +282,16 @@
 			<option value='errorOnValue' furtheroptions='cfieldoptiontest,cfieldoptioncondition'>stop with error if value: </option>
 		  </select>
 		  <input type='text' class='cfieldoptioncurrencies cinitiallyhidden cfurtheroption cinput4' name='currencies' value='&pound;&dollar;&yen;&euro;,' placeholder='list of currency symbols'>
-		  <input type='text' class='cfieldoptioninputstring cinitiallyhidden cfurtheroption cinput4' name='matches' value='' placeholder='string to replace'>
-		  <input type='text' class='cfieldoptioninputregexp cinitiallyhidden cfurtheroption cinput4' name='matches' value='' placeholder='regexp'>
+		  <input type='text' class='cfieldoptioninputmatch cinitiallyhidden cfurtheroption cinput4' name='matches' value='' placeholder='matches'>
 		  <input type='text' class='cfieldoptionoutput cinitiallyhidden cfurtheroption cinput4' name='output' value='' placeholder='replacement'>
 		  <span class='coptionset cfieldoptiontest cinitiallyhidden cfurtheroption'>
 			<select class='cinput4' name='test'>
 			  <option value='value' selected='selected' furtheroptions=''>value</option>
 			  <option value='field' furtheroptions='cfieldoptionfield'>earlier field</option>			  
+			  <option value='column' furtheroptions='cfieldoptioncolumn'>column (letter/header)</option>			  
 			</select>
 			<input type='text' class='cfieldoptionfield cinitiallyhidden cfurtheroption cinput4' name='field' value='' placeholder='field name'>
+			<input type='text' class='cfieldoptioncolumn cinitiallyhidden cfurtheroption cinput4' name='column' value='' placeholder='column'>
 		  </span>
 		  <span class='coptionset cfieldoptioncondition cinitiallyhidden cfurtheroption'>
 			<select class='cinput4' name='condition'>

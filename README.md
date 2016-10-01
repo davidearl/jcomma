@@ -212,6 +212,10 @@ In table formats (HTML, CSV, XLSX), the values just appear as consecutive column
 
 You can usefully have more than one field with the same name (usually consecutive), providing you set options to omit each in opposite circumstances. For example, say you have debit and credit columns in the original CSV but require a single simple number, positive for credit and negative for debit. So you would make one field from credit and the same field from debit, each of which has the option to omit if blank, and convert to a number, while debit also includes the option to negate when converting to a number.
 
+### don't include in output
+
+(`"exclude": true` [in the spec](#hspec)) excludes the field from the output altogether. This differs from the "omit" conditions in that the field remains in the output record until it is output and is therefore available to be referenced from other fields. In this way, it behaves a bit like a variable.
+
 (#hcomprising)
 ### Field concatenated from
 
@@ -250,13 +254,17 @@ Available options are as follows:
 
 * ***output as custom date*** (`"item": "convertToCustomDate", "errorOnType": true, "dateFormatUS": true, "dateFormatStyle": "j M Y"` [in the spec](#hspec)): Similar to ISO date, but you can specify the output style yourself (including time parts). This uses the [PHP date function](http://php.net/manual/en/function.date.php) in which letters in the date style are replaced by parts of the date or time. For example "M j, Y" produces dates like "Dec 1, 2016" because M means the abbreviated month name, j means the day without leading zeros and Y means the four digit year. Many other variants are possible - see [date](http://php.net/manual/en/function.date.php).
 
-* ***omit field if...*** (`"item": "omitIf", "condition": "...", ...` [in the spec](#hspec)): Having transformed the field by whatever other methods, the result can be discarded completely if the [condition](#hcondition) selected here is satisifed. Omiting a field is potentially useful in JSON and XML formats, but in tabular formats (CSV, HTML, XLSX) this would result in columns shifting left by one, so it would be better to transform (above) to an empty string value instead. Note that when a field is omitted, no further options are applied for it, but it is not actually discarded until all the fields have been computed. This means that an omitted field can be used by later fields in concatenation or conditions, which means it can act rather like a variable.
+* ***omit field if...*** (`"item": "omitIf", "condition": "...", ...` [in the spec](#hspec)): Having transformed the field by whatever other methods, the field is discarded if the [condition](#hcondition) selected here is satisifed. Omiting a field is potentially useful in JSON and XML formats, but in tabular formats (CSV, HTML, XLSX) this would result in columns shifting left by one, so it would be better to transform (above) to an empty string value instead. Note that when a field is omitted, no further options are applied for it and the field is not available to later fields for comparison etc.
 
 * ***skip next option if...*** and ***skip next option unless...*** (`"item": "skipIf", "condition": "...", ...` or `"item": "Unless", "condition": "...", ...` [in the spec](#hspec)): The following option can be applied or not depending on the outcome of this [condition](#hcondition).
 
 * ***stop with error if value...*** (`"item": "errorOnValue", "condition": "...", ...` [in the spec](#hspec)): Having transformed the field by whatever other methods, the whole conversion process can be terminated if the [condition](#hcondition) selected here is satisifed: for example if an unexpected value is encountered.
 
-Each of the condition options (skip, omit and stop) can use either the currently computed value for the field from the earlier steps (`"test": "value"` [in the spec](#hspec)), or the value of any earlier field (`"test": "field", "field": "name"` [in the spec](#hspec)), to compare with the value given.
+Each of the condition options (skip, omit and stop) can compare the value given with any of:
+
+* the currently computed value for the field from the earlier steps (`"test": "value"` [in the spec](#hspec)), 
+* the value of a column (`"test": "column", "column": "header"` [in the spec](#hspec))
+* the value of any earlier field (`"test": "field", "field": "name"` [in the spec](#hspec))
 
 (#hunless)
 ### Don't output record...

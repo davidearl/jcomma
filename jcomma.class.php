@@ -205,9 +205,14 @@ class jcomma {
         $options = $this->checkarray(array('records', $ir, 'fields', $if, 'options'), array());
         for($io = 0; $io < count($options); $io++) {
           $test = $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'test'),
-                                     array('value','field'), TRUE, 'value');
-          if ($test == 'field') {
-            $field = $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'field'));
+                                     array('value','field','column'), TRUE, 'value');
+          switch ($test) {
+          case 'field':
+            $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'field'));
+            break;
+          case 'column':
+            $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'column'));
+            break;
           }
 
           $item = $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'item'),
@@ -296,7 +301,7 @@ class jcomma {
     }
   }
   
-  function comparevalue($option, $outputvalue, $outputrecord) {
+  function comparevalue($option, $rows, $outputvalue, $outputrecord) {
     $test = empty($option->test) ? 'value' : $option->test;
     switch($test) {
     case 'field':
@@ -304,6 +309,11 @@ class jcomma {
         $this->oops("at row {$this->currentrow}, {$option->field} is not a previous field in the same record");
       }
       return $outputrecord->{$option->field};
+    case 'column':
+      if (! isset($rows[0 /* allow rowOffset here? */][$this->columnnumber($option->column)])) {
+        $this->oops("at row {$this->currentrow}, column {$option->column} unknown");
+      }
+      return $rows[0 /* allow rowOffset here? */][$this->columnnumber($option->column)];
     case 'value':
       return $outputvalue;
     }
@@ -407,13 +417,15 @@ class jcomma {
       foreach($this->spec->records as $record) {
 
         $outputrecord = new stdClass();
-        $omitfields = array();
+        $excludefields = array();
         
         foreach ($record->fields as $field) {
 
           /* calculate outputvalue for field according to 'comprising' */
           $outputvalue = '';
           $outputtype = 'string';
+          if (! empty($field->exclude)) { $excludefields[] = $field->name; }
+
           foreach($field->comprising as $comprising) {
             switch($comprising->item) {
             case 'column':
@@ -453,12 +465,12 @@ class jcomma {
               break;
             case 'replaceRegExp':
               if (empty($option->matches)) { break; }
-              $outputvalue = preg_replace($option->matches, $option->output, $outputvalue);
+              $outputvalue = preg_replace($option->matches, isset($option->output) ? $option->output : '', $outputvalue);
               if (is_null($outputvalue)) { self::oops("incorrect regexp '{$option->matches}'"); }
               break;
             case 'replaceString':
               if (empty($option->matches)) { break; }
-              $outputvalue = str_replace($option->matches, $option->output, $outputvalue);
+              $outputvalue = str_replace($option->matches, isset($option->output) ? $option->output : '', $outputvalue);
               break;
             case 'trim':
               $outputvalue = trim($outputvalue);
@@ -472,7 +484,7 @@ class jcomma {
                 if (empty($option->condition)) { break; }
                 if ($this->meetscondition($option->condition,
                                           empty($option->value) ? '' : $option->value,
-                                          $this->comparevalue($option, $outputvalue, $outputrecord)))
+                                          $this->comparevalue($option, $rows, $outputvalue, $outputrecord)))
                 {
                   $omitnextoption = TRUE;
                 }
@@ -481,7 +493,7 @@ class jcomma {
                 if (empty($option->condition)) { break; }
                 if (! $this->meetscondition($option->condition,
                                           empty($option->value) ? '' : $option->value,
-                                          $this->comparevalue($option, $outputvalue, $outputrecord)))
+                                          $this->comparevalue($option, $rows, $outputvalue, $outputrecord)))
                 {
                   $omitnextoption = TRUE;
                 }
@@ -490,25 +502,24 @@ class jcomma {
                 if (empty($option->condition)) { break; }
                 if ($this->meetscondition($option->condition,
                                           empty($option->value) ? '' : $option->value,
-                                          $this->comparevalue($option, $outputvalue, $outputrecord)))
+                                          $this->comparevalue($option, $rows, $outputvalue, $outputrecord)))
                 {
-                  $omitfields[$field->name] = TRUE;
-                  continue 2;
+                  continue 3;
                 }
                 break;
             case 'errorOnValue':
                 if (empty($option->condition)) { break; }
                 if ($this->meetscondition($option->condition,
                                           empty($option->value) ? '' : $option->value,
-                                          $this->comparevalue($option, $outputvalue, $outputrecord)))
+                                          $this->comparevalue($option, $rows, $outputvalue, $outputrecord)))
                 {
-                  $this->oops("at row {$this->currentrow}, {$outputvalue}, failed errorOnValue check)");
+                  $this->oops("at row {$this->currentrow}, '{$outputvalue}', failed errorOnValue check)");
                 }
                 break;
             case 'convertToNumber':
               if (! is_numeric($outputvalue)) {
                 if (! empty($option->errorOnType)) {
-                  $this->oops("at row {$this->currentrow}, {$outputvalue} is not numeric (failed errorOnType check)");
+                  $this->oops("at row {$this->currentrow}, '{$outputvalue}' is not numeric (failed errorOnType check)");
                 }
                 $outputvalue = 0;
               } else {
@@ -522,7 +533,7 @@ class jcomma {
               $time = strtotime($date);
               if ($time === FALSE) {
                 if (! empty($option->errorOnType)) {
-                  $this->oops("at row {$this->currentrow}, {$outputvalue} does not look like a date/time (failed errorOnType check)");
+                  $this->oops("at row {$this->currentrow}, '{$outputvalue}' does not look like a date/time (failed errorOnType check)");
                 }
                 $outputvalue = '';
               } else {
@@ -565,7 +576,7 @@ class jcomma {
         }
         
         /* if everything is OK, save the new record, omitting any fields requested */
-        foreach($omitfields as $omitfield => $true) { unset($outputrecord->$omitfield); }
+        foreach($excludefields as $excludefield) { unset($outputrecord->$excludefield); }
         $output[] = $outputrecord;
       }
     }
