@@ -132,7 +132,7 @@ $(function(){
 	}
 
 	function savespec() {
-		/* save to localStorage on each change */
+		/* save to localStorage and the copy+paste field on each change */
 		localStorage.spec = makespec();
 		$("#iacopyoptions").val(localStorage.spec);
 	}
@@ -156,7 +156,7 @@ $(function(){
 			var r = new FileReader();
 			r.onload = function(e2){
 				loadspec(r.result);
-				localStorage.spec = r.result;
+				savespec();
 			};
 			r.readAsText(f);
 		}
