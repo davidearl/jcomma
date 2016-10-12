@@ -98,7 +98,7 @@ body {
 }
 
 .cgroup, .cadd {
-	margin-left: 70px;
+	margin-left: 50px;
 }
 
 input[type=text] {
@@ -126,8 +126,20 @@ select {
 .cfields {
 	border: 1px solid #888;
 	padding: 5px 5px 15px 5px;
-	margin: 5px 5px 5px 70px;
+	margin: 5px 5px 5px 50px;
 	background: #eeeeee;
+}
+
+.crecords {
+    border: 1px solid #888;
+    padding: 5px 5px 15px 5px;
+    margin: 5px 5px 5px 50px;
+    background: #eefff1;
+}
+
+.crecords > .cgroup,
+.cfields > .cgroup {
+	margin-left: 0;
 }
 
 #icomment {
@@ -209,7 +221,21 @@ a {
 	top: 5px;
 }
 
-#iapasteoptions,#iacopyoptions {
+#ipasteoptions,#icopyoptions {
 	width: 40%;
 	height: 1.8em;
+}
+
+.cloadrecipeoptions, .csaverecipeoptions
+{
+	display: inline-block;
+	box-sizing: border-box;
+	width: 49%;
+	vertical-align: top;
+}
+
+.csaverecipeoptions {
+	border-left: 1px solid silver;
+	padding-left: 20px;
+	height: 210px;
 }

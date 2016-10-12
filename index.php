@@ -24,33 +24,89 @@
   </ul>
   <p><a href='help.php' target='jcommahelp'>Help</a> | <a href='https://github.com/davidearl/jcomma/blob/master/LICENSE'>MIT License</a> | <a href='https://github.com/davidearl/jcomma'>On GitHub</a></p>
   <hr>
-
-  <div>
-    Load settings from file <a class='chelp cinfo' href='help.php?a=hloadsettings'></a>: <input type='file' id='ialoadoptions'><br>
-	Or paste settings here:<br><textarea id='iapasteoptions'></textarea>
-  </div>
-
-  <div>
-	<a href='#' id='ireset'>reset settings</a> <a class='chelp cinfo' href='help.php?a=hresetsettings'></a>
-  </div>
   
-  <div id='iform'>	
+  <p style='max-width: 800px;'>This page lets you prepare a recipe which tells jcomma how to
+  interpret CSV files laid out in a particular way, e.g. by a bank's
+  statement download. You can then apply the same recipe repeatedly to
+  the same kinds of file.
+  </p>
+  
+  <hr>
+
+  <div>
+	<form id='isubmission' action='jcomma.php' class='csubmission' method='POST' target='_blank' enctype='multipart/form-data'>
+	  <label for='icsv'><strong>CSV File</strong>:</label> <a class='chelp cinfo' href='help.php?a=hcsv'></a>
+	  <input type='file' id='icsv' name='csv'><br>
+	  <input type='hidden' id='isendrecipe' name='recipe'>
+	  <input type='submit' id='isubmit' value='Do it!'>
+	</form>
+  </div>
+
+  <hr>
+
+  <div>
+	<div class='cloadrecipeoptions'>
+	  <div>
+		<strong>Load recipe</strong> from file <a class='chelp cinfo' href='help.php?a=hloadrecipe'></a>:
+		<input type='file' id='iloadrecipe'><br>
+		<span>or</span> paste recipe here:<br>
+		<textarea id='ipasterecipe'></textarea>
+	  </div>
+
+	  <div>
+		<span>or</span> <select id='iloadselect'></select> from browser storage
+		<a class='chelp cinfo' href='help.php?a=hloadselect'></a>
+	  </div>
+
+	  <div>
+		<span>or</span> <a href='#' id='ireset'>reset recipe</a> <a class='chelp cinfo' href='help.php?a=hresetrecipe'></a>
+	  </div>
+
+	  <div>
+		<span>or</span> <a href='#' id='ideleterecipe'>delete recipe</a> from browser storage, and reset
+		<a class='chelp cinfo' href='help.php?a=hdeleterecipe'></a>
+	  </div>
+	</div>
+
+	<div class='csaverecipeoptions'>
+	  <div>
+		<strong>Save recipe</strong> <a id='isaverecipe'>to file</a> <a class='chelp cinfo' href='help.php?a=hsaverecipe'></a>
+	  </div>
+
+	  <div>
+		or copy recipe from here:<br>
+		<textarea id='icopyrecipe' readonly></textarea>
+	  </div>
+	</div>
+  </div>
+	
+  <hr>
+
+  <div id='iform'>
+	<h2>your recipe&hellip;</h2>
+
 	<div class='csection coptions clevel1'>
-	  <label class='clabelheader' for='icomment'>Comment/description:</label> (just for your own information) <a class='chelp cinfo' href='help.php?a=hcomment'></a><br>
-	    <textarea id='icomment' class='cinput1' name='comment'></textarea>
+	  <label class='clabelheader' for='irecipename'>Recipe name:</label> <a class='chelp cinfo' href='help.php?a=hrecipename'></a>
+		<input type='text' id='irecipename' class='cinput cinput1' name='recipeName' placeholder='name (optional)'>
 	</div>
 	
 	<div class='csection coptions clevel1'>
-	  <label class='clabelheader'>Output to:</label> <a class='chelp cinfo' href='help.php?a=houtputto'></a><br>
-	  <select id='ioutputto' class='cinput1' name='outputTo'>
+	  <label class='clabelheader' for='icomment'>Comment/description:</label> (just for your own information) <a class='chelp cinfo' href='help.php?a=hcomment'></a><br>
+	    <textarea id='icomment' class='cinput cinput1' name='comment'></textarea>
+	</div>
+	
+	<div class='csection coptions clevel1'>
+	  <label class='clabelheader'>Output to:</label>
+	  <select id='ioutputto' class='cinput cinput1' name='outputTo'>
 		<option value='attachment' selected='selected'>file download</option>
 		<option value='inline'>browser tab</option>
 	  </select>
+	  <a class='chelp cinfo' href='help.php?a=houtputto'></a>
 	</div>
 	
 	<div class='csection coptionset coptions clevel1'>
-	  <label class='clabelheader'>Output format:</label> <a class='chelp cinfo' href='help.php?a=houtputformat'></a><br>
-	  <select id='ioutputformat' name='outputFormat' class='cinput1'>
+	  <label class='clabelheader'>Output format:</label> <a class='chelp cinfo' href='help.php?a=houtputformat'></a>
+	  <select id='ioutputformat' name='outputFormat' class='cinput cinput1'>
 		<option value='json' selected='selected' furtheroptions='coutputformatjson'>json</option>
 		<option value='csv' furtheroptions='coutputformatcsv'>csv</option>
 		<option value='xlsx' furtheroptions='coutputformatxlsx'>xlsx (Excel 2007)</option>
@@ -60,42 +116,42 @@
 	  </select>
 
 	  <span class='coutputformatjson cfurtheroption' >
-		<input type='checkbox' id='ioutputstyle' class='cinput1' name='outputStyle' value='pretty'>
+		<input type='checkbox' id='ioutputstyle' class='cinput cinput1' name='outputStyle' value='pretty'>
 	      <label for='ioutputstyle'>pretty print</label>
-		<input type='checkbox' id='ioutputbulkelastic' class='cinput1' name='outputBulkElastic' >
+		<input type='checkbox' id='ioutputbulkelastic' class='cinput cinput1' name='outputBulkElastic' >
 	      <label for='ioutputbulkelastic'>bulk data for elasticsearch</label>
-		<input type='text' id='ioutputjsonname' class='cinput1' name='outputName' placeholder='type name (optional)'>
+		<input type='text' id='ioutputjsonname' class='cinput cinput1' name='outputName' placeholder='type name (optional)'>
 	  </span>
 	  
 	  <span class='coutputformatcsv cinitiallyhidden cfurtheroption'>
 		<label for='ioutputcsvencoding'>output encoding: </label>
-		<select id='ioutputcsvencoding' name='outputEncoding' class='cinput1'>
+		<select id='ioutputcsvencoding' name='outputEncoding' class='cinput cinput1'>
 		  <option value='Windows-1251' selected>Windows-1251 for Excel</option>
 		  <option value='UTF-8'>UTF-8 for e.g. Google Sheets</option>
 		</select>
-		<input type='checkbox' id='ioutputcsvheaderrow' class='cinput1' name='outputHeaderRow' value='true'>
+		<input type='checkbox' id='ioutputcsvheaderrow' class='cinput cinput1' name='outputHeaderRow' value='true'>
 	      <label for='ioutputcsvheaderrow'>include header row</label>
 	  </span>
 	  
 	  <span class='coutputformatxlsx cinitiallyhidden cfurtheroption'>
-		<input type='checkbox' id='ioutputxlsxheaderrow' class='cinput1' name='outputHeaderRow' value='true'>
+		<input type='checkbox' id='ioutputxlsxheaderrow' class='cinput cinput1' name='outputHeaderRow' value='true'>
 	      <label for='ioutputxlsxheaderrow'>include header row</label>
 	  </span>
 	  
 	  <span class='coutputformathtml cinitiallyhidden cfurtheroption'>
-		<input type='checkbox' id='ioutputhtmlxheaderrow' class='cinput1' name='outputHeaderRow' value='true'>
+		<input type='checkbox' id='ioutputhtmlxheaderrow' class='cinput cinput1' name='outputHeaderRow' value='true'>
 	      <label for='ioutputhtmlheaderrow'>include header row</label>
 	  </span>
 	  
 	  <span class='coutputformatxml cinitiallyhidden cfurtheroption' >
-		<input type='checkbox' id='ioutputxmlelements' class='cinput1' name='outputXMLElements' value='true'>
+		<input type='checkbox' id='ioutputxmlelements' class='cinput cinput1' name='outputXMLElements' value='true'>
 	      <label for='ioutputxmlelements'>values as elements rather than attributes</label>
-		<input type='text' id='ioutputxmlname' class='cinput1' name='outputName' placeholder='element name (optional)'>
+		<input type='text' id='ioutputxmlname' class='cinput cinput1' name='outputName' placeholder='element name (optional)'>
 	  </span>
 	  
 	  <span class='coutputformatqif cinitiallyhidden cfurtheroption' >
         Transaction types:
-        <select id='ioutputqiftype' class='cinput1' name='outputQIFType'>
+        <select id='ioutputqiftype' class='cinput cinput1' name='outputQIFType'>
           <option value='Bank'>Cash flow: current account</option>
           <option value='Cash'>Cash flow: cash</option>
           <option value='CCard'>Cash flow: credit card</option>
@@ -108,13 +164,8 @@
 	</div>
 	
 	<div class='csection coptions'>
-	  <label class='clabelheader'>CSV Input:</label><br>
-	  <label for='icsv'>CSV File:</label> <a class='chelp cinfo' href='help.php?a=hcsv'></a>
-	  <form id='isubmission' action='jcomma.php' class='csubmission' method='POST' target='jcommaresult' enctype='multipart/form-data'>
-	    <input type='file' id='icsv' name='csv'>
-	  </form><br>
 	  <label for='iencoding'>Input CSV encoding:</label> <a class='chelp cinfo' href='help.php?a=hencoding'></a>
-		<select id='iencoding' class='cinput1' name='encoding'>
+		<select id='iencoding' class='cinput cinput1' name='encoding'>
 		  <option value='auto'>attempt to detect automatically</option>
 		  <option value='UTF-8'>UTF-8 (Google Sheets)</option>
 		  <option value='Windows-1250'>Windows cp1250 (typically Excel)</option>
@@ -123,14 +174,15 @@
 	</div>
 	
 	<div class='csection coptions clevel1'>
-	  <label for='iheaderrows'>Header rows:</label> <a class='chelp cinfo' href='help.php?a=hheaderrows'></a>
-	  <input type='text' class='cshortinput cint cinput1' id='iheaderrows' name='headerRows' pattern='[0-9]+' value='0'> (last header row entries can be used to refer to columns below)<br>
+	  <label for='iheaderrows'>Header rows:</label>
+	  <input type='text' class='cshortinput cint cinput cinput1' id='iheaderrows' name='headerRows' pattern='[0-9]+' value='0'> (last header row entries can be used to refer to columns below)
+	  <a class='chelp cinfo' href='help.php?a=hheaderrows'></a>
 	  <!-- possible enhancement: header rows until or while condition -->
 	</div>
 	
 	<div class='csection coptions clevel1'>
 	  <label for='irowcount'>Each record formed from </label> 
-	    <input type='text' class='cshortinput cint cinput1' id='irowcount' name='rowCount' pattern='[0-9]+' title='digits only' value='1'> rows of the CSV <a class='chelp cinfo' href='help.php?a=hrowcount'></a>
+	    <input type='text' class='cshortinput cint cinput cinput1' id='irowcount' name='rowCount' pattern='[0-9]+' title='digits only' value='1'> rows of the CSV <a class='chelp cinfo' href='help.php?a=hrowcount'></a>
 	</div>
 
 	<div class='csection coptions clevel1'>
@@ -144,11 +196,6 @@
 	  <ul class='clist'></ul>
 	  <button id='iaddrecord' class='cadd' proforma='irecordproforma'>+</button> <span class='canother'>another record</span>
 	</div>
-
-    <div class='csection clevel1'>
-	  <input type='submit' id='isubmit' value='Do it!'> (in new tab when not downloaded)
-	  <span class='cfilewarning'>No CSV file currently selected!</span>
-	</div>
   </div>
 
   <ul class='cproformascontainer cinitiallyhidden'>	
@@ -156,13 +203,13 @@
 	  <button class='cmove cmove2'>&#x2195;</button>
 	  <button class='cremove'>&#x274c;</button>
 	  <div class='cgroup'>	
-		<select class='cignorerowstype cinput2' name='item'>
+		<select class='cignorerowstype cinput cinput2' name='item'>
 		  <option value='column'>If column...</option>
 		  <option value='field'>If field...</option>
 		</select>
-		<input type='text' class='cignorerowsname cinput2' name='name' placeholder='column letter/header or field name'>
+		<input type='text' class='cignorerowsname cinput cinput2' name='name' placeholder='column letter/header or field name'>
 		<div class='coptionset cfurtheroptions'>
-		  <select class='cignorerowscondition cinput2' name='condition'>
+		  <select class='cignorerowscondition cinput cinput2' name='condition'>
 			<option value='empty' selected='selected' furtheroptions=''>empty (no text at all)</option>
 			<option value='white' furtheroptions=''>whitespace only or empty</option>
 			<option value='match' furtheroptions='cignorerowsvalue'>matches regular expression</option>
@@ -174,7 +221,7 @@
             <option value='before' furtheroptions='cignorerowsvalue'>before (date):</option>
             <option value='after' furtheroptions='cignorerowsvalue'>after (date):</option>
 		  </select>
-		  <input type='text' class='cignorerowsvalue cinitiallyhidden cfurtheroption cinput2' name='value' placeholder='value to compare with'>
+		  <input type='text' class='cignorerowsvalue cinitiallyhidden cfurtheroption cinput cinput2' name='value' placeholder='value to compare with'>
 		  <a class='chelp cinfo' href='help.php?a=hconditions'></a>
 		</div>
 	  </div>
@@ -203,8 +250,8 @@
 	  <button class='cremove'>&#x274c;</button>
 	  <div class='coptionset coptions cgroup'>
 		<label>if field </label>
-		  <input type='text' class='crecordiffield cinput3' name='field' placeholder='field name'>
-		<select class='crecordifcondition cinput3' name='condition'>
+		  <input type='text' class='crecordiffield cinput cinput3' name='field' placeholder='field name'>
+		<select class='crecordifcondition cinput cinput3' name='condition'>
 		  <option value='empty' selected='selected' furtheroptions=''>empty (no text at all)</option>
 		  <option value='white' furtheroptions=''>whitespace only or empty</option>
 		  <option value='match' furtheroptions='crecordifvalue'>matches regular expression</option>
@@ -216,7 +263,7 @@
           <option value='before' furtheroptions='crecordifvalue'>before (date):</option>
           <option value='after' furtheroptions='crecordifvalue'>after (date):</option>
 		</select>
-		<input type='text' class='crecordifvalue cinitiallyhidden cfurtheroption cinput3' name='value' placeholder='value to compare with'> <a class='chelp cinfo' href='help.php?a=hconditions'></a>
+		<input type='text' class='crecordifvalue cinitiallyhidden cfurtheroption cinput cinput3' name='value' placeholder='value to compare with'> <a class='chelp cinfo' href='help.php?a=hconditions'></a>
 	  </div>
 	</li>
 
@@ -224,9 +271,9 @@
 	  <button class='cmove cmove3'>&#x2195;</button>
 	  <button class='cremove'>&#x274c;</button>
 	  <div class='coptions cgroup'>
-		<label>field name:</label> <a class='chelp cinfo' href='help.php?a=hname'></a> <input type='text' class='cfieldname cinput3 cnotqif' name='name' placeholder='field name'>
+		<label class='clabelheader'>Field name:</label> <a class='chelp cinfo' href='help.php?a=hname'></a> <input type='text' class='cfieldname cinput cinput3 cnotqif' name='name' placeholder='field name'>
 		<!-- alternatively for QIF, there is a fixed set of fields: -->
-		<select name='name' class='cfieldname cinput3 cqif'>
+		<select name='name' class='cfieldname cinput cinput3 cqif'>
 		  <option value='D'>D: Date</option>
 		  <option value='T'>T: Amount</option>
 		  <option value='M'>M: Memo</option>
@@ -247,7 +294,7 @@
 		  <option value='O'>O: Commission cost</option>
 		  <option value='$'>$: Amount transferred</option>
 		</select>
-        <input type='checkbox' name='exclude' class='cinput3' value='true'> don't include in output
+        <input type='checkbox' name='exclude' class='cinput cinput3' value='true'> don't include in output
 		<br>
 		<label class='clabelheader'>Field concatenated from:</label>
 		  <a class='chelp cinfo' href='help.php?a=hcomprising'></a><br>
@@ -266,7 +313,7 @@
 	  <button class='cremove'>&#x274c;</button>
 	  <div class='coptions cgroup'>
 		<div class='coptionset cfurtheroptions'>
-		  <select class='cfieldoptionitem cinput4' name='item'>
+		  <select class='cfieldoptionitem cinput cinput4' name='item'>
 			<option value='' furtheroptions=''>choose&hellip;</option>
 			<option value='ignoreCurrency' furtheroptions='cfieldoptioncurrencies'>ignore currency symbols as follows</option>
 			<option value='bookkeepersNegative' furtheroptions=''>treat '(1.23)' or '1.23-' as negative: '-1.23'</option>
@@ -281,20 +328,20 @@
 			<option value='omitIf' furtheroptions='cfieldoptiontest,cfieldoptioncondition'>omit field if:</option>
 			<option value='errorOnValue' furtheroptions='cfieldoptiontest,cfieldoptioncondition'>stop with error if value: </option>
 		  </select>
-		  <input type='text' class='cfieldoptioncurrencies cinitiallyhidden cfurtheroption cinput4' name='currencies' value='&pound;&dollar;&yen;&euro;,' placeholder='list of currency symbols'>
-		  <input type='text' class='cfieldoptioninputmatch cinitiallyhidden cfurtheroption cinput4' name='matches' value='' placeholder='matches'>
-		  <input type='text' class='cfieldoptionoutput cinitiallyhidden cfurtheroption cinput4' name='output' value='' placeholder='replacement'>
+		  <input type='text' class='cfieldoptioncurrencies cinitiallyhidden cfurtheroption cinput cinput4' name='currencies' value='&pound;&dollar;&yen;&euro;,' placeholder='list of currency symbols'>
+		  <input type='text' class='cfieldoptioninputmatch cinitiallyhidden cfurtheroption cinput cinput4' name='matches' value='' placeholder='matches'>
+		  <input type='text' class='cfieldoptionoutput cinitiallyhidden cfurtheroption cinput cinput4' name='output' value='' placeholder='replacement'>
 		  <span class='coptionset cfieldoptiontest cinitiallyhidden cfurtheroption'>
-			<select class='cinput4' name='test'>
+			<select class='cinput cinput4' name='test'>
 			  <option value='value' selected='selected' furtheroptions=''>value</option>
 			  <option value='field' furtheroptions='cfieldoptionfield'>earlier field</option>			  
 			  <option value='column' furtheroptions='cfieldoptioncolumn'>column (letter/header)</option>			  
 			</select>
-			<input type='text' class='cfieldoptionfield cinitiallyhidden cfurtheroption cinput4' name='field' value='' placeholder='field name'>
-			<input type='text' class='cfieldoptioncolumn cinitiallyhidden cfurtheroption cinput4' name='column' value='' placeholder='column'>
+			<input type='text' class='cfieldoptionfield cinitiallyhidden cfurtheroption cinput cinput4' name='field' value='' placeholder='field name'>
+			<input type='text' class='cfieldoptioncolumn cinitiallyhidden cfurtheroption cinput cinput4' name='column' value='' placeholder='column'>
 		  </span>
 		  <span class='coptionset cfieldoptioncondition cinitiallyhidden cfurtheroption'>
-			<select class='cinput4' name='condition'>
+			<select class='cinput cinput4' name='condition'>
 			  <option value='empty' selected='selected' furtheroptions=''>is empty (no text at all)</option>
 			  <option value='white' furtheroptions=''>is whitespace only or empty</option>
 			  <option value='match' furtheroptions='cfieldoptionvalue'>matches regular expression</option>
@@ -306,20 +353,20 @@
               <option value='before' furtheroptions='cfieldoptionvalue'>is before (date):</option>
               <option value='after' furtheroptions='cfieldoptionvalue'>is after (date):</option>
 			</select> 
-			<input type='text' class='cfieldoptionvalue cinitiallyhidden cfurtheroption cinput4' name='value' value='' placeholder='compared with'>
+			<input type='text' class='cfieldoptionvalue cinitiallyhidden cfurtheroption cinput cinput4' name='value' value='' placeholder='compared with'>
 		  </span>
-		  <input type='text' class='cfieldoptionconvertdatestyle cinitiallyhidden cfurtheroption cinput4' name='dateFormatStyle' value='' placeholder='date style'>
+		  <input type='text' class='cfieldoptionconvertdatestyle cinitiallyhidden cfurtheroption cinput cinput4' name='dateFormatStyle' value='' placeholder='date style'>
 		  <span class='cfieldoptionconverterror cinitiallyhidden cfurtheroption'>
-			<input type='checkbox' class='cinput4' name='errorOnType' value='true'> stop on conversion error
+			<input type='checkbox' class='cinput cinput4' name='errorOnType' value='true'> stop on conversion error
 		  </span>
 		  <span class='cfieldoptionnegate cinitiallyhidden cfurtheroption'>
-			<input type='checkbox' class='cinput4' name='negate' value='true'> negate after conversion
+			<input type='checkbox' class='cinput cinput4' name='negate' value='true'> negate after conversion
 		  </span>
 		  <span class='cfieldoptionconvertdateformat cinitiallyhidden cfurtheroption'>
-			<input type='checkbox' class='cinput4' name='dateFormatUS' value='true'> US dates: e.g. treat 3/4/2016 as March 4
+			<input type='checkbox' class='cinput cinput4' name='dateFormatUS' value='true'> US dates: e.g. treat 3/4/2016 as March 4
 		  </span>
 		  <span class='cfieldoptionconverttime cinitiallyhidden cfurtheroption'>
-			<input type='checkbox' class='cinput4' name='dateFormatTime' value='true'> output time as well as date
+			<input type='checkbox' class='cinput cinput4' name='dateFormatTime' value='true'> output time as well as date
 		  </span>
 		</div>
 	  </div>
@@ -329,34 +376,29 @@
 	  <button class='cmove cmove4'>&#x2195;</button>
 	  <button class='cremove'>&#x274c;</button>
 	  <div class='coptionset coptions cgroup'>
-		<select class='cfieldoptionitem cinput4' name='item'>
+		<select class='cfieldoptionitem cinput cinput4' name='item'>
 		  <option value=''>choose&hellip;</option>
 		  <option value='column' furtheroptions='cfieldcomprisingcolumn,cfieldappend'>column (letter or header):</option>
 		  <option value='field' furtheroptions='cfieldcomprisingfield,cfieldappend'>earlier field (in this record):</option>
 		  <option value='text' furtheroptions='cfieldcomprisingtext'>verbatim text:</option>
 		</select>
 		<span class='cinitiallyhidden cfurtheroption cfieldcomprisingcolumn'>
-		  <input type='text' class='cinput4' name='column' value='' placeholder='column letter/header'>
+		  <input type='text' class='cinput cinput4' name='column' value='' placeholder='column letter/header'>
 		  row offset: 
-		  <input type='text' class='cinput4 cshortinput cint' name='rowOffset' pattern='[0-9]*' value='' placeholder='row offset'>
+		  <input type='text' class='cinput cinput4 cshortinput cint' name='rowOffset' pattern='[0-9]*' value='' placeholder='row offset'>
 		</span>
-		<input type='text' class='cfieldcomprisingtext cinitiallyhidden cfurtheroption cinput4' name='text' value='' placeholder='text to include'>
+		<input type='text' class='cfieldcomprisingtext cinitiallyhidden cfurtheroption cinput cinput4' name='text' value='' placeholder='text to include'>
 		<span class='cinitiallyhidden cfurtheroption cfieldcomprisingfield'>
-		  <input type='text' class='cinput4' name='field' value='' placeholder='field name'>
+		  <input type='text' class='cinput cinput4' name='field' value='' placeholder='field name'>
 		</span>
 		<span class='cinitiallyhidden cfurtheroption cfieldappend'>
-		  <input type='checkbox' class='cinput4' name='appendComma' value='true'> append comma
-		  <input type='checkbox' class='cinput4' name='appendSpace' value='true'> append space
+		  <input type='checkbox' class='cinput cinput4' name='appendComma' value='true'> append comma
+		  <input type='checkbox' class='cinput cinput4' name='appendSpace' value='true'> append space
 		</span>
 	  </div>
 	</li>
   </ul>
 	
-  <div>
-	<a id='iasaveoptions'>save settings to file</a> <a class='chelp cinfo' href='help.php?a=hsavesettings'></a><br>
-	or copy settings from here:<br><textarea id='iacopyoptions' readonly></textarea>
-  </div>
-
   <div id='ihelp'>
      <div id='ihelpcontrols'>
        <a href='help.php' target='jcommahelp'>view in separate window</a> | <a href='#' id='ihelpclose'>close</a>
@@ -365,5 +407,6 @@
       <iframe id='ihelpframe' src='help.php'></iframe>
     </div>
   </div>
+
 </body>
 </html>

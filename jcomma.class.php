@@ -1,12 +1,12 @@
 <?php
 
-define ("CURRENT_VERSION", 2);
+define ("CURRENT_VERSION", 3);
 
 class jcomma {
 
-  function __construct($path, $spec) {
+  function __construct($path, $recipe) {
     $this->path = $path;
-    $this->spec = $spec;
+    $this->recipe = $recipe;
     $this->currentrow = 0;
     $this->errors = array();
   }
@@ -51,7 +51,7 @@ class jcomma {
   }
   
   function checkint($field, $ge=NULL, $default=NULL){
-    $v = $this->inspec($field, $default);
+    $v = $this->inrecipe($field, $default);
     if (gettype($v) != 'integer') {
       $this->errors[] = $this->describefield($field, 'is not an integer', $v);
       return $v;
@@ -64,7 +64,7 @@ class jcomma {
   }
 
   function checkfloat($field, $default=NULL){
-    $v = $this->inspec($field, $default);
+    $v = $this->inrecipe($field, $default);
     if (! is_numeric($v)) {
       $this->errors[] = $this->describefield($field, 'is not a number', $v);
       return $v;
@@ -72,7 +72,7 @@ class jcomma {
   }
 
   function checkdate($field, $default=NULL){
-    $v = $this->inspec($field, $default);
+    $v = $this->inrecipe($field, $default);
     if (strpos($v, '/') !== FALSE) {
       $this->errors[] = $this->describefield($field, ' - ambiguous date format (use YYYY-MM-DD)', $v);
       return $v;
@@ -84,19 +84,19 @@ class jcomma {
   }
 
   function checkarray($field, $default=NULL) {
-    $v = $this->inspec($field, $default);
+    $v = $this->inrecipe($field, $default);
     if (! is_array($v)) { $this->errors[] = $this->describefield($field, 'is not an array'); }
     return $v;
   }
 
   function checkobject($field, $default=NULL) {
-    $v = $this->inspec($field, $default);
+    $v = $this->inrecipe($field, $default);
     if (! is_object($v)) { $this->errors[] = $this->describefield($field, 'is not an object'); }
     return $v;
   }
 
   function checkstring($field, $permitted=NULL, $emptyallowed=FALSE, $default=NULL) {
-    $v = $this->inspec($field, $default);
+    $v = $this->inrecipe($field, $default);
     if (! is_string($v)) {
       $this->errors[] = ' is not a string';
     } else if (! is_null($permitted) && ! in_array($v, $permitted)) {
@@ -129,13 +129,13 @@ class jcomma {
     return $condition;
   }
   
-  function inspec($field, $default=NULL) {
+  function inrecipe($field, $default=NULL) {
     /* $field is an array of names and numbers where each name is an
        element and number an array index.  For example ("a", 5, "b")
-       looks for and selects $this->spec->a[5]->b if it
+       looks for and selects $this->recipe->a[5]->b if it
        exists. Returns NULL if any of path missing, and sets an error
        if not optional (i.e. there is no default) */
-    $o = $this->spec;
+    $o = $this->recipe;
     for($i = 0; $i < count($field); $i++) {
       $f = $field[$i];
       $last = $i == count($field)-1;
@@ -165,9 +165,9 @@ class jcomma {
   }
   
   function validate(){
-    $this->checkint(array('specVersion'), 1, 1);
-    if ($this->spec->specVersion > CURRENT_VERSION) {
-      $this->oops("The server version ".CURRENT_VERSION." predates the spec version ({$this->spec->specVersion}) supplied");
+    $this->checkint(array('recipeVersion'), 1, 1);
+    if ($this->recipe->recipeVersion > CURRENT_VERSION) {
+      $this->oops("The server version ".CURRENT_VERSION." predates the recipe version ({$this->recipe->recipeVersion}) supplied");
     }
     $this->checkstring(array('outputFormat'),
                        array('json','csv', 'html', 'xlsx', 'xml', 'qif'),
@@ -181,7 +181,7 @@ class jcomma {
     $this->checkstring(array('encoding'), NULL, FALSE, 'auto');
 
     $this->checkarray(array('ignoreRows'), array());
-    for($i = 0; $i < count($this->spec->ignoreRows); $i++) {
+    for($i = 0; $i < count($this->recipe->ignoreRows); $i++) {
       $this->checkstring(array('ignoreRows', $i, 'item'), array('column', 'field'));
       $this->checkstring(array('ignoreRows', $i, 'name'));
       $this->checkcondition(array('ignoreRows', $i, 'condition'));
@@ -192,7 +192,7 @@ class jcomma {
       $this->errors[] = 'records array is empty - nothing would be produced';
     }
 
-    for($ir = 0; $ir < count($this->spec->records); $ir++) {
+    for($ir = 0; $ir < count($this->recipe->records); $ir++) {
       $unless = $this->checkarray(array('records', $ir, 'unless'), array());
       for ($iu = 0; $iu < count($unless); $iu++) {
         $this->checkstring(array('records', $ir, 'unless', $iu, 'field'));
@@ -269,7 +269,7 @@ class jcomma {
   }
 
 
-  function meetscondition($condition, $vspec, $vcsv) {
+  function meetscondition($condition, $vrecipe, $vcsv) {
     switch($condition) {
     case 'empty':
       return $vcsv == '';
@@ -277,25 +277,25 @@ class jcomma {
       return trim($vcsv) == '';
     case 'match':
     case 'nomatch':
-      $matches = preg_match($vspec, $vcsv);
-      if ($matches === FALSE) { self::oops("incorrect regexp '{$vspec}'"); }
+      $matches = preg_match($vrecipe, $vcsv);
+      if ($matches === FALSE) { self::oops("incorrect regexp '{$vrecipe}'"); }
       return $matches == ($condition == 'match' ? 1 : 0);
     case 'eq':
-      if (gettype($vcsv) == 'integer' || gettype($vcsv) == 'float') { $vspec = (float)$vspec; }
-      return $vspec == $vcsv;
+      if (gettype($vcsv) == 'integer' || gettype($vcsv) == 'float') { $vrecipe = (float)$vrecipe; }
+      return $vrecipe == $vcsv;
     case 'ne':
-      if (gettype($vcsv) == 'integer' || gettype($vcsv) == 'float') { $vspec = (float)$vspec; }
-      return $vspec != $vcsv;
+      if (gettype($vcsv) == 'integer' || gettype($vcsv) == 'float') { $vrecipe = (float)$vrecipe; }
+      return $vrecipe != $vcsv;
     case 'ge':
-      return (float)$vcsv >= (float)$vspec;
+      return (float)$vcsv >= (float)$vrecipe;
     case 'le':
-      return (float)$vcsv <= (float)$vspec;
+      return (float)$vcsv <= (float)$vrecipe;
     case 'before':
       if (strpos($vcsv, '/') !== FALSE) { self::oops("{$vscv} is an ambiguous date format"); }
-      return strtotime($vcsv) < strtotime($vspec);
+      return strtotime($vcsv) < strtotime($vrecipe);
     case 'after':
       if (strpos($vcsv, '/') !== FALSE) { self::oops("{$vscv} is an ambiguous date format"); }
-      return strtotime($vcsv) > strtotime($vspec);
+      return strtotime($vcsv) > strtotime($vrecipe);
     default:
       return FALSE;
     }
@@ -321,9 +321,9 @@ class jcomma {
 
   function asutf8($row /* array of cells (strings) */) {
     if (! isset($this->encoding)) {        
-      if (empty($this->spec->encoding)) { $this->spec->encoding = 'auto'; }
-      if ($this->spec->encoding != 'auto') {
-        $this->encoding = $this->spec->encoding;
+      if (empty($this->recipe->encoding)) { $this->recipe->encoding = 'auto'; }
+      if ($this->recipe->encoding != 'auto') {
+        $this->encoding = $this->recipe->encoding;
       } else {
         $topbitset = FALSE;
         $s = implode(' ', $row);
@@ -358,7 +358,7 @@ class jcomma {
       if ($row === FALSE) { return FALSE; }
       if (! $exact) {
         /* see if we should ignore this row per condition specified */
-        foreach($this->spec->ignoreRows as $ignoreRow) {
+        foreach($this->recipe->ignoreRows as $ignoreRow) {
           if ($ignoreRow->item != 'column') { continue; }
           $nc = $this->columnnumber($ignoreRow->name);
           if (isset($row[$nc])) {
@@ -391,8 +391,8 @@ class jcomma {
     if ($this->fd === FALSE) { self::oops("cannot open csv file"); }
 
     $this->headings = NULL;
-    if ($this->spec->headerRows > 0) {
-      $rows = $this->readrows($this->spec->headerRows, TRUE /* exactly that number, don't ignore any rows */);
+    if ($this->recipe->headerRows > 0) {
+      $rows = $this->readrows($this->recipe->headerRows, TRUE /* exactly that number, don't ignore any rows */);
       if (empty($rows)) { self::oops('nothing useful in file except possibly headers'); }
       /* there may be a byte order mark, and fgetcsv seems to ignore this */
       if (count($rows[0]) > 0 && substr($rows[0][0], 0, 3) == "\xef\xbb\xbf" /* BOM */) {
@@ -402,19 +402,19 @@ class jcomma {
           $rows[0][0] = str_replace('""', '"', substr($rows[0][0], 1, strlen($rows[0][0])-2));
         }
       }
-      for ($i = 0; $i < count($rows[$this->spec->headerRows-1]); $i++) {
-        $this->headings[strtoupper($rows[$this->spec->headerRows-1][$i])] = $this->columnletter($i);
+      for ($i = 0; $i < count($rows[$this->recipe->headerRows-1]); $i++) {
+        $this->headings[strtoupper($rows[$this->recipe->headerRows-1][$i])] = $this->columnletter($i);
       }
     }
 
     $output = array();
     
     for(;;) {
-      $rows = $this->readrows($this->spec->rowCount);
+      $rows = $this->readrows($this->recipe->rowCount);
       if (empty($rows)) { break; }
 
       /* produce each record required from this group of fields */
-      foreach($this->spec->records as $record) {
+      foreach($this->recipe->records as $record) {
 
         $outputrecord = new stdClass();
         $excludefields = array();
@@ -568,7 +568,7 @@ class jcomma {
         }
         
         /* abandon the record if any ignore row condition based on field is met */
-        foreach($this->spec->ignoreRows as $ignoreRow) {
+        foreach($this->recipe->ignoreRows as $ignoreRow) {
           if ($ignoreRow->item != 'field') { continue; }
           $ignorevalue = ! isset($ignoreRow->value) ? '' : $ignoreRow->value;
           if ($this->meetscondition($ignoreRow->condition, $ignorevalue,
@@ -598,22 +598,22 @@ class jcomma {
                        'qif'=>'text/plain',
     );
     $this->cl = $cl;
-    $this->elementname = empty($this->spec->outputName) ?
+    $this->elementname = empty($this->recipe->outputName) ?
                        preg_replace('~[^a-z0-9_]~i', '', str_replace('.csv','',$inputfilename)) :
-                       $this->spec->outputName;
-    if (! $this->cl && $this->spec->outputTo != 'string') {
-      header("Content-type: {$mimetypes[$this->spec->outputFormat]}");
-      header($this->spec->outputTo == 'inline' && 
-             $this->spec->outputFormat != 'csv' && $this->spec->outputFormat != 'xlsx' ?
+                       $this->recipe->outputName;
+    if (! $this->cl && $this->recipe->outputTo != 'string') {
+      header("Content-type: {$mimetypes[$this->recipe->outputFormat]}");
+      header($this->recipe->outputTo == 'inline' && 
+             $this->recipe->outputFormat != 'csv' && $this->recipe->outputFormat != 'xlsx' ?
                'Content-disposition: inline' :
-               'Content-disposition: attachment; filename="'.str_replace('.csv', ".{$this->spec->outputFormat}",
+               'Content-disposition: attachment; filename="'.str_replace('.csv', ".{$this->recipe->outputFormat}",
                                                                          $inputfilename).'"');
       header('Content-Transfer-Encoding: binary');
       if (! empty($this->encoding)) { header("X-Comment-Original-CSV-Encoding: {$this->encoding}"); }
       ob_end_flush();
     }
 
-    switch($this->spec->outputFormat){
+    switch($this->recipe->outputFormat){
     case 'json': $s = $this->outputjson($output); break;
     case 'csv': $s = $this->outputcsv($output); break;
     case 'html': $s = $this->outputhtml($output); break;
@@ -622,12 +622,12 @@ class jcomma {
     case 'qif': $s = $this->outputqif($output); break;
     }
 
-    if ($this->spec->outputTo == 'string') { return $s; } else { echo $s; }
+    if ($this->recipe->outputTo == 'string') { return $s; } else { echo $s; }
   }
 
   function outputjson($output){
-    if (empty($this->spec->outputBulkElastic)) {
-      $s = ! empty($this->spec->outputStyle) && $this->spec->outputStyle == 'pretty' ?
+    if (empty($this->recipe->outputBulkElastic)) {
+      $s = ! empty($this->recipe->outputStyle) && $this->recipe->outputStyle == 'pretty' ?
          json_encode($output, JSON_PRETTY_PRINT) : json_encode($output);
     } else {
       $s = '';
@@ -639,8 +639,8 @@ class jcomma {
   }
 
   function outputcsv($output) {
-    $encoding = empty($this->spec->outputEncoding) ? NULL : $this->spec->outputEncoding;
-    $s = ! empty($this->spec->outputHeaderRow) ? $this->csv_keys($output[0], '', array(), $encoding) : '';
+    $encoding = empty($this->recipe->outputEncoding) ? NULL : $this->recipe->outputEncoding;
+    $s = ! empty($this->recipe->outputHeaderRow) ? $this->csv_keys($output[0], '', array(), $encoding) : '';
     foreach($output as $record) { $s .= $this->csv_values($record, '', $encoding); }
     return $s;
   }
@@ -687,7 +687,7 @@ class jcomma {
   function outputxlsx($output) {
     include_once('PHP_XLSXWriter/xlsxwriter.class.php');
     $x = new XLSXWriter();
-    if (! empty($this->spec->outputHeaderRow) && ! empty($output)) {
+    if (! empty($this->recipe->outputHeaderRow) && ! empty($output)) {
       $x->writeSheetHeader('Sheet1', $this->xlsx_flattenkeys($output[0], array()));
     }
     foreach($output as $row) {
@@ -737,6 +737,7 @@ class jcomma {
 <html>
 <head>
 <meta charset='UTF-8'>
+<title>jcomma: html output</title>
 <style>
 body { font-family: Arial, Helvetica, sans-serif; }
 table { border-collapse: collapse; }
@@ -747,7 +748,7 @@ td { border: 1px solid black; padding: 2px; min-height: 18px; }
 <table>
 
 EOD;
-    if (! empty($this->spec->outputHeaderRow)) {
+    if (! empty($this->recipe->outputHeaderRow)) {
       $s .= "<thead><tr>\n";
       $s .= $this->html_keys($output[0], array());
       $s .= "</tr></thead>\n";
@@ -831,7 +832,7 @@ EOD;
   }
 
   function outputqif($output) {
-    $s = '!Type:'.(empty($this->spec->outputQIFType) ? 'Bank' : $this->spec->outputQIFType)."\n";
+    $s = '!Type:'.(empty($this->recipe->outputQIFType) ? 'Bank' : $this->recipe->outputQIFType)."\n";
     foreach($output as $record) {
       foreach($record as $k=>$v) {
         switch($k) {

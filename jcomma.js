@@ -1,9 +1,9 @@
 $(function(){
 
 	function sorting() {
-		$(".clevel1 .clist").sortable({handle: ".cmove2", cancel: "", stop: savespec});
-		$(".clevel2 .clist").sortable({handle: ".cmove3", cancel: "", stop: savespec});
-		$(".clevel3 .clist").sortable({handle: ".cmove4", cancel: "", stop: savespec});
+		$(".clevel1 .clist").sortable({handle: ".cmove2", cancel: "", stop: saverecipe});
+		$(".clevel2 .clist").sortable({handle: ".cmove3", cancel: "", stop: saverecipe});
+		$(".clevel3 .clist").sortable({handle: ".cmove4", cancel: "", stop: saverecipe});
 	}
 	sorting();
 	
@@ -13,7 +13,7 @@ $(function(){
 		var jself = $(this);
 		$("#"+jself.attr("proforma")).clone().removeClass("cproforma").
 			removeAttr("id").appendTo(jself.prev("ul.clist"));
-		savespec();
+		saverecipe();
 		sorting();
 	});
 
@@ -22,10 +22,10 @@ $(function(){
 		e.preventDefault(); e.stopPropagation();
 		var jself = $(this);
 		jself.closest(".cgroup").remove();
-		savespec();
+		saverecipe();
 	});
 
-	$("body").on("change", "select", function(e){
+	$("body").on("change", "select.cinput", function(e){
 		/* some select choices come with further options; the furtheroptions attribute identifies these. 
 		   Make visible those and only those (in the same set of options) for this select */
 		var jself = $(this);		
@@ -37,9 +37,10 @@ $(function(){
 		f.split(",").forEach(function(el,idx){ jparent.find("."+el).show(); });		
 	});
 
-	$("body").on("change", "select,input[type=text],input[type=checkbox],textarea", function(e){
+	$("body").on("change", ".cinput", function(e){
 		/* always keep the current state in storage so we can restore it on revisiting the page */
-		savespec();
+		saverecipe();
+		if ($(this).attr("id") == "irecipename") { recipeselectoptions(); }
 	});
 
 	$("body").on("click", "a.chelp", function(e){
@@ -62,10 +63,52 @@ $(function(){
 	}
 	
 	$("#ioutputformat").change(toggleqif);
+
+	var prefix = "recipe=";
+	function recipestoragename(name) { return prefix+name; }
+	function getlocalrecipejson(name){ return localStorage[recipestoragename(name)]; }
+	function putlocalrecipejson(name, recipe){ localStorage[recipestoragename(name)] = recipe; }
+	function haslocalrecipe(name){ return (recipestoragename(name) in localStorage); }
+	function recipenames(){
+		var names = [];
+		$.each(localStorage, function(k, v){
+			if (k.substr(0, prefix.length) != prefix) { return; }
+			names.push(k.substr(prefix.length));
+		});
+		return names.sort(function(a,b){ return a.toLowerCase().localeCompare(b.toLowerCase()); });
+	}
+
+	
+	$("#iloadselect").change(function(e){
+		var name = $(this).val();
+		localStorage.currentRecipe = name;
+		loadrecipe(getlocalrecipejson(name));
+		recipeselectoptions();
+	});
+	
+	var defaultrecipe = JSON.stringify({
+		recipeName: "(anonymous)",
+		comment: "",
+		outputTo: "attachment",
+		outputFormat: "json",
+		encoding: "auto",
+		headerRows: 0,
+		rowCount: 1
+	});
 	
 	$("#ireset").click(function(e){
 		e.preventDefault(); e.stopPropagation();
-		loadspec("{\"comment\":\"\",\"outputTo\":\"attachment\",\"outputFormat\":\"json\",\"encoding\":\"auto\",\"headerRows\":0,\"rowCount\":1}");	
+		loadrecipe(defaultrecipe);
+	});
+
+	$("#ideleterecipe").click(function(e){
+		e.preventDefault(); e.stopPropagation();
+		var name = $("#irecipename").val();
+		if (name == "") { alert("your recipe is anonymous"); return; }
+		if (! haslocalrecipe(name)) { alert("your recipe is not stored"); return; }
+		delete localStorage[recipestoragename(name)];
+		loadrecipe(defaultrecipe);
+		recipeselectoptions();
 	});
 	
 	function recurse(level, jel){
@@ -85,21 +128,26 @@ $(function(){
 		return j;
 	}	
 	
-	$("#isubmit").on("click", function(e){
+	$("#isubmission").on("submit", function(e){
 		/* invoke the API - we use the existing form which just
 		   contains an input type file, and add to that the single
-		   hidden field for the JSON spec which says how to interpret
+		   hidden field for the JSON recipe which says how to interpret
 		   the file */
-		$(".csubmithidden").remove();
-		$("<input>").attr({type: "hidden", value: makespec(), name: "spec"}).
-			addClass("csubmithidden").appendTo("#isubmission");
-		$("#isubmission").submit();
+		if ($("#icsv").val() == "") {
+			e.preventDefault();
+			alert("you need to choose a csv file to process");
+			return;
+		}
+		$("#isendrecipe").val(makerecipe());
+		// and continue to submit
 	});
 
-	$("#iasaveoptions").click(function(){
+	$("#isaverecipe").click(function(){
 		/* rather than invoking the API, just save the options for re-use later */
-		$(this).attr({href: "data:application/json;charset=utf-8," + encodeURIComponent(makespec()),
-					  download: 'jcomma.json'});
+		var name = $("#irecipename").val();
+		if (name == "") { name = "(anonymous)"; }
+		$(this).attr({href: "data:application/json;charset=utf-8," + encodeURIComponent(makerecipe()),
+					  download: name+".jcomma.json"});
 	});
 
 	function populate(k, v, j){
@@ -124,58 +172,68 @@ $(function(){
 		}
 	}
 
-	function makespec(){
+	function makerecipe(){
 		/* capture the form content and return as a JSON string (we may save this to a file or localStorage) */
 		var data = recurse(1, $("#iform .coptions"));
-		data.specVersion = 1;
+		data.recipeVersion = 3;
 		return JSON.stringify(data);
 	}
 
-	function savespec() {
+	function saverecipe() {
 		/* save to localStorage and the copy+paste field on each change */
-		localStorage.spec = makespec();
-		$("#iacopyoptions").val(localStorage.spec);
+		var name = $("#irecipename").val();
+		if (name == "") { name = "(anonymous)"; }
+		localStorage.currentRecipe = name;
+		putlocalrecipejson(name, makerecipe());
+		$("#icopyrecipe").val(localStorage[recipestoragename(name)]);
 	}
 	
-	function loadspec(spec){
-		/* given a spec JSON string, set the form fields correspondingly */
+	function loadrecipe(recipejson){
+		/* given a recipe JSON string, set the form fields correspondingly */
 		$("#iform .cremove").each(function(idx,el) { $(el).closest(".cgroup").remove(); });
-		var spec = JSON.parse(spec);
-		if (! spec) { return; }
-		$.each(spec, function(k, v){ populate(k, v, $("#iform")); });
+		var recipe = JSON.parse(recipejson);
+		if (! ("recipeName" in recipe)) { recipe.recipeName = "(anonymous)"; }
+		if (! recipe) { return; }
+		$.each(recipe, function(k, v){ populate(k, v, $("#iform")); });
 		toggleqif();
 		sorting();
-		$("#iacopyoptions").val(localStorage.spec);
+		$("#icopyrecipe").val(recipejson);
+		localStorage.currentRecipe = recipe.recipeName;
+	}
+
+	function recipeselectoptions(){
+		var jselect = $("#iloadselect").empty();
+		$("<option>").prop({readonly: true}).text("choose one").appendTo(jselect);
+		$.each(recipenames(), function(idx, name){
+			$("<option>").text(name).appendTo(jselect);
+		});
 	}
 	
-	$("#ialoadoptions").change(function(e1){
-		/* load spec from file in response to the choose file button for this */
+	$("#iloadrecipe").change(function(e1){
+		/* load recipe from file in response to the choose file button for this */
 		var f = $(this)[0].files[0];
 		$(this).val("");
 		if (f) {
 			var r = new FileReader();
 			r.onload = function(e2){
-				loadspec(r.result);
-				savespec();
+				loadrecipe(r.result);
+				saverecipe();
 			};
 			r.readAsText(f);
 		}
 	});
 
-	$("#iapasteoptions").change(function(e1){
-		/* load spec from contents */		
-		loadspec($(this).val());
+	$("#ipasterecipe").change(function(e1){
+		/* load recipe from contents */		
+		loadrecipe($(this).val());
 		$(this).val("done")
 	});
 
-	$("#iacopyoptions,#iapasteoptions").focus(function(){
+	$("#icopyrecipe,#ipasterecipe").focus(function(){
 		$(this).select();
 	});
 	
-	$("#icsv").change(function(e){
-		$(".cfilewarning").toggle($(this).val() == "");
-	});
-	
 	/* reload automatically from any previous use (except for the CSV file itself) */
-	if ("spec" in localStorage) { loadspec(localStorage.spec); }
+	if ("currentRecipe" in localStorage) { loadrecipe(getlocalrecipejson(localStorage.currentRecipe)); }
+	recipeselectoptions();
 });

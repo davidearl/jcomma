@@ -10,7 +10,7 @@ try {
   $cl = ! empty($argv);
   if ($cl) {
     if (count($argv) >= 3 && $argv[1] == '-s') {
-      $spec = json_decode(file_get_contents($argv[2]));
+      $recipe = json_decode(file_get_contents($argv[2]));
       array_splice($argv, 1, 2);
     }
     if (count($argv) > 1) {
@@ -23,12 +23,12 @@ try {
       $path = 'php:://stdin';
       $filename = 'stdin.csv';
     }
-  } else if (! empty($_POST['spec'])) {
-    $spec = json_decode($_POST['spec']);
+  } else if (! empty($_POST['recipe'])) {
+    $recipe = json_decode($_POST['recipe']);
   } else {
-    oops('no spec provided');
+    oops('no recipe provided');
   }
-  if ($spec === FALSE) { oops('spec is not valid JSON'); }
+  if ($recipe === FALSE) { oops('recipe is not valid JSON'); }
 
   if (! $cl) {
     if (empty($_FILES['csv']['name'])) { oops("no file uploaded"); }
@@ -50,7 +50,7 @@ try {
     $path = $_FILES['csv']['tmp_name'];  
   }
   
-  $jcomma = new jcomma($path, $spec);
+  $jcomma = new jcomma($path, $recipe);
   $errors = $jcomma->validate();
   if (! empty($errors)) { oops(implode("\n", $errors)); }
 
@@ -68,5 +68,5 @@ try {
     fwrite(STDERR, $e->getMessage());
     die(1);
   }
-  // echo json_encode($spec, JSON_PRETTY_PRINT);
+  // echo json_encode($recipe, JSON_PRETTY_PRINT);
 }
