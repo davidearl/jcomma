@@ -127,14 +127,14 @@ select {
 	border: 1px solid #888;
 	padding: 5px 5px 15px 5px;
 	margin: 5px 5px 5px 50px;
-	background: #eeeeee;
+	background: white;;
 }
 
 .crecords {
     border: 1px solid #888;
     padding: 5px 5px 15px 5px;
     margin: 5px 5px 5px 50px;
-    background: #eefff1;
+    background: #e4e4e4;
 }
 
 .crecords > .cgroup,

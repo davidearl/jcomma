@@ -199,6 +199,7 @@ $(function(){
 		sorting();
 		$("#icopyrecipe").val(recipejson);
 		localStorage.currentRecipe = recipe.recipeName;
+		$("#iyourrecipe").fadeOut(100, function(){ $(this).fadeIn(400); });
 	}
 
 	function recipeselectoptions(){
@@ -218,6 +219,7 @@ $(function(){
 			r.onload = function(e2){
 				loadrecipe(r.result);
 				saverecipe();
+				recipeselectoptions();
 			};
 			r.readAsText(f);
 		}

@@ -83,7 +83,7 @@
   <hr>
 
   <div id='iform'>
-	<h2>your recipe&hellip;</h2>
+	<h2 id='iyourrecipe'>your recipe&hellip;</h2>
 
 	<div class='csection coptions clevel1'>
 	  <label class='clabelheader' for='irecipename'>Recipe name:</label> <a class='chelp cinfo' href='help.php?a=hrecipename'></a>
