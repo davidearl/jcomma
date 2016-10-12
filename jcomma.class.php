@@ -4,8 +4,12 @@ define ("CURRENT_VERSION", 3);
 
 class jcomma {
 
-  function __construct($path, $recipe) {
-    $this->path = $path;
+  function __construct($path_or_filedescriptor, $recipe) {
+    if (is_string($path_or_filedescriptor)) {
+      $this->path = $path_or_filedescriptor;
+    } else {
+      $this->fd = $path_or_filedescriptor;
+    }
     $this->recipe = $recipe;
     $this->currentrow = 0;
     $this->errors = array();
@@ -387,7 +391,7 @@ class jcomma {
   }
 
   function convert() {
-    $this->fd = fopen($this->path, 'r');
+    if (! empty($this->path)) { $this->fd = fopen($this->path, 'r'); }
     if ($this->fd === FALSE) { self::oops("cannot open csv file"); }
 
     $this->headings = NULL;
@@ -581,7 +585,7 @@ class jcomma {
       }
     }
     
-    fclose($this->fd);
+    if (! empty($this->path)) { fclose($this->fd); }
 
     return $output;
   }
