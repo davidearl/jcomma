@@ -380,13 +380,37 @@ class jcomma {
     return $rows;
   }
   
-  function dotted($o, $s) {
-    /* selects $o->$a->$b->... where $s is something like "a.b...", returning NULL if anything on the 
-       path does not exist */
-    foreach(explode('.', $s) as $f) {
-      if (! is_object($o) || ! isset($o->$f)) { return NULL; }
-      $o = $o->$f;
+  function varpath($r, $name, $value=NULL) {
+    /* retrieves and, if value not null, sets the value in r according to path, which should 
+       be something like 'a[3].b' or 'a[3].b[4]', or more likely just 'a' */
+    $o = $r;
+    $parts = preg_split('~[\\[\\.]~', $name);
+    if ($parts[0] == '') { $this->oops("missing field name in '{$name}'"); }
+    if (! isset($o->{$parts[0]})) { $o->{$parts[0]} = NULL; /* for now; this should be a name */ }
+    $o =& $o->{$parts[0]};
+    for($i = 1; $i < count($parts); $i++) {
+      if (preg_match('~^\\s*([0-9]+)\\s*\\]\\s*$~', $parts[$i], $m)) {
+        $index = (int)($m[1]);
+        if (is_null($o)) {
+          $o = [];
+        } else if (isset($o->{$parts[$i]}) && is_object($o)) {
+          $this->oops("for field name '{$name}' array/object structure is inconsistent with an earlier one");
+        }
+        if (! isset($o[$index])) { $o[$index] = NULL; }
+        $o =& $o[$index];
+      } else if (strpos(']', $parts[$i]) !== FALSE) {
+        $this->oops("for field name '{$name}' array subscript needs to be preceded by a name");
+      } else {
+        if (is_null($o)) {
+          $o = new stdClass();
+        } else if (isset($o->{$parts[$i]}) && is_array($o->{$parts[$i]})) {
+          $this->oops("for field name '{$name}' array/object structure is inconsistent with an earlier one");
+        }
+        if (! isset($o->{$parts[$i]})) { $o->{$parts[$i]} = NULL; }
+        $o =& $o->{$parts[$i]};
+      }
     }
+    if (! is_null($value)) { $o = $value; }
     return $o;
   }
 
@@ -553,14 +577,7 @@ class jcomma {
             }
           }
 
-          /* assign to result, taking account of dotted fields */
-          $dotteds = explode('.', $field->name);
-          $o = $outputrecord;
-          for($i = 0; $i < count($dotteds)-1 /* sic */; $i++) {
-            if (! isset($o->{$dotteds[$i]})) { $o->{$dotteds[$i]} = new stdClass(); }
-            $o = $o->{$dotteds[$i]};
-          }
-          $o->{$dotteds[count($dotteds)-1]} = $outputvalue;
+          $this->varpath($outputrecord, $field->name, $outputvalue); // assign outputvalue to outputrecord
           if (! isset($this->outputtypes[$field->name])) { $this->outputtypes[$field->name] = $outputtype; }
         }
           
@@ -568,7 +585,7 @@ class jcomma {
         foreach($record->unless as $unless) {
           $unlessvalue = ! isset($unless->value) ? '' : $unless->value;
           if ($this->meetscondition($unless->condition, $unlessvalue,
-                                    $this->dotted($outputrecord, $unless->field))) { continue 2; }
+                                    $this->varpath($outputrecord, $unless->field))) { continue 2; }
         }
         
         /* abandon the record if any ignore row condition based on field is met */
@@ -576,7 +593,7 @@ class jcomma {
           if ($ignoreRow->item != 'field') { continue; }
           $ignorevalue = ! isset($ignoreRow->value) ? '' : $ignoreRow->value;
           if ($this->meetscondition($ignoreRow->condition, $ignorevalue,
-                                    $this->dotted($outputrecord, $ignoreRow->name))) { continue 2; }
+                                    $this->varpath($outputrecord, $ignoreRow->name))) { continue 2; }
         }
         
         /* if everything is OK, save the new record, omitting any fields requested */
@@ -642,10 +659,20 @@ class jcomma {
     return $s;
   }
 
+  function flattenkeys($ks, $k){
+    $kk = '';
+    $p = '';
+    foreach(array_merge($ks, [$k]) as $k1) {
+      $kk .= is_string($k1) ? "{$p}{$k1}" : "[{$k1}]";
+      $p = '.';
+    }
+    return $kk;
+  }
+  
   function outputcsv($output) {
     $encoding = empty($this->recipe->outputEncoding) ? NULL : $this->recipe->outputEncoding;
-    $s = ! empty($this->recipe->outputHeaderRow) ? $this->csv_keys($output[0], '', array(), $encoding) : '';
-    foreach($output as $record) { $s .= $this->csv_values($record, '', $encoding); }
+    $s = ! empty($this->recipe->outputHeaderRow) ? $this->csv_keys($output[0], '', array(), $encoding)."\n" : '';
+    foreach($output as $record) { $s .= $this->csv_values($record, '', $encoding)."\n"; }
     return $s;
   }
 
@@ -662,30 +689,30 @@ class jcomma {
     $s = '';
     if (is_object($data)) { $data = (array)$data; }
     foreach($data as $k => $v) {
-      if (is_object($v)) {
+      if (is_object($v) || is_array($v)) {
         $s .= $this->csv_values($v, $p, $encoding);
       } else {
         $s .= $this->csv_value($v, $p, $encoding);
       }
       $p = ',';
     }
-    return $s."\n";
+    return $s;
   }
 
   function csv_keys($data, $p, $ks, $encoding){
     $s = '';
     if (is_object($data)) { $data = (array)$data; }
     foreach($data as $k => $v) {
-      if (is_object($v)) {
-        $s .= $this->csv_keys($v, $p, array_merge($ks, $k), $encoding);
-      } else if (! empty($ks)) {
-        $s .= $this->csv_value(implode('.', array_merge($ks, $k)), $p, $encoding);
+      if (is_object($v) || is_array($v)) {
+        $s .= $this->csv_keys($v, $p, array_merge($ks, [$k]), $encoding);
+      } else if (! empty($ks)) {        
+        $s .= $this->csv_value($this->flattenkeys($ks, $k), $p, $encoding);
       } else {
         $s .= $this->csv_value($k, $p, $encoding);
       }
       $p = ',';
     }
-    return $s."\n";
+    return $s;
   }
   
   function outputxlsx($output) {
@@ -706,7 +733,7 @@ class jcomma {
     $a = array();
     if (is_object($data)) { $data = (array)$data; }
     foreach($data as $k => $v) {
-      if (is_object($v)) {
+      if (is_object($v) || is_array($v)) {
         $a = array_merge($a, $this->xlsx_flatten($v));
       } else {
         $a[] = $v;
@@ -719,13 +746,13 @@ class jcomma {
     $a = array();
     if (is_object($data)) { $data = (array)$data; }
     foreach($data as $k => $v) {
-      if (is_object($v)) {
-        $a = array_merge($a, $this->xlsx_flattenkeys($v, array_merge($ks, array($k))));
+      if (is_object($v) || is_array($v)) {
+        $a = array_merge($a, $this->xlsx_flattenkeys($v, array_merge($ks, [$k])));
       } else if (! empty($ks)) {
-        $k = implode('.', array_merge($ks, $k));
         $type = gettype($v);
-        if ($type == 'string' && isset($this->outputtypes[$k])) { $type = $this->outputtypes[$k]; }        
-        $a[$k] = $v;
+        $k1 = $this->flattenkeys($ks,$k);
+        if ($type == 'string' && isset($this->outputtypes[$k1])) { $type = $this->outputtypes[$k1]; }
+        $a[$k1] = $type;
       } else {
         $type = gettype($v);
         if ($type == 'string' && isset($this->outputtypes[$k])) { $type = $this->outputtypes[$k]; }
@@ -779,7 +806,7 @@ EOD;
     $s = '';
     if (is_object($data)) { $data = (array)$data; }
     foreach($data as $k => $v) {
-      if (is_object($v)) {
+      if (is_object($v) || is_array($v)) {
         $s .= $this->html_values($v);
       } else {
         $s .= $this->html_value($v);
@@ -792,10 +819,10 @@ EOD;
     $s = '';
     if (is_object($data)) { $data = (array)$data; }
     foreach($data as $k => $v) {
-      if (is_object($v)) {
-        $s .= $this->html_keys($v, array_merge($ks, $k));
+      if (is_object($v) || is_array($v)) {
+        $s .= $this->html_keys($v, array_merge($ks, [$k]));
       } else if (! empty($ks)) {
-        $s .= $this->html_value(implode('.', array_merge($ks, $k)));
+        $s .= $this->html_value($this->flattenkeys($ks, $k));
       } else {
         $s .= $this->html_value($k);
       }
@@ -807,32 +834,60 @@ EOD;
     $s = '<'.'?'.'xml version="1.0" encoding="UTF-8" standalone="yes" '.'?'.'>'."\n";
     $s .= "<{$this->elementname}s>\n";
     foreach($output as $record) {
-      $s .= empty($this->spec->outputXMLElements) ? $this->xmlify_attributes($record) : $this->xmlify_elements($record);
+      $s .= empty($this->recipe->outputXMLElements) ?
+         $this->xmlify_attributes($record, $this->elementname) :
+         $this->xmlify_elements($record, $this->elementname);
     }
     return "{$s}</{$this->elementname}s>\n";
   }
 
-  function xmlify_attributes($record){
-    $s = "<{$this->elementname}";
+  function xmlify_attributes($record, $key){
+    $s = "<{$key}";
     $subordinates = array();
     if (is_object($record)) { $record = (array)$record; }
     foreach($record as $k=>$v) {
-      if (is_object($v)) { $subordinates[$k] = $v; }
-      else { $s .= " {$k}='".htmlspecialchars($v)."'"; }
+      if (is_object($v)) {
+        $subordinates[$k][] = $v;
+      } else if (is_array($v)) {
+        foreach($v as $i => $va) {
+          if (is_object($va)) {
+            $va->_index = $i;
+            $subordinates[$k][] = $va;
+          } else {
+            $vaa = new stdClass();
+            $vaa->_index = $i;
+            $vaa->_value = $va;
+            $subordinates[$k][] = $vaa;
+          }
+        }
+      } else {
+        $s .= " {$k}='".htmlspecialchars($v)."'";
+      }
     }
     $s .= '>';
-    foreach ($subordinates as $k=>$v) { $s .= $this->xmlify_attributes($v, $k); }
-    return $s."</{$this->elementname}>\n";
+    foreach ($subordinates as $k => $va) {
+      foreach($va as $i => $v) { $s .= $this->xmlify_attributes($v, $k); }
+    }
+    return $s."</{$key}>\n";
   }
 
-  function xmlify_elements($record){
-    $s = "<{$this->elementname}>\n";
-    if (is_object($record)) { $record = (array)$record; }
-    foreach($record as $k=>$v) {
-      if (is_object($v)) { $s .= $this->xmlify_elements($v, $k); }
-      else { $s .= "  <{$k}>".htmlspecialchars($v)."</{$k}>\n"; }
+  function xmlify_elements($record, $key, $index=NULL){
+    $index = is_null($index) ? '' : " _index=\"{$index}\"";
+    $s = "<{$key}{$index}>\n";
+    if (is_array($record)) {
+      foreach($record as $i => $v) {
+        /* try to derive a singular name from plural if possible */
+        $ka = substr($key,-2) == 'es' ? substr($key,0,-2) : (substr($key,-1) == 's' ? substr($key,0,-1) : $key);
+        $s .= $this->xmlify_elements($v, $ka, $i);
+      }
+    } else {
+      if (is_object($record)) { $record = (array)$record; }
+      foreach($record as $k=>$v) {
+        if (is_object($v) || is_array($v)) { $s .= $this->xmlify_elements($v, $k); }
+        else { $s .= "  <{$k}>".htmlspecialchars($v)."</{$k}>\n"; }
+      }
     }
-    return $s."</{$this->elementname}>\n";
+    return $s."</{$key}>\n";
   }
 
   function outputqif($output) {

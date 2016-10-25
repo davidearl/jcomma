@@ -207,7 +207,7 @@ Fields are delivered in the order they are specified in the output records.
 
 Field names (`"name": "whatever"` [in the recipe](#hrecipe)) is used in the output, for example as object member names in JSON, as element names in XML or column headings in CSV, HTML and XLSX.
 
-If names contain periods, then subordinate objects are constructed for those formats which can support hierarchical output. For example, we might have output fields called "salutation", "address.city" and "address.postcode". In JSON output these would appear as:
+If names contain periods and/or integers in square brackets, then subordinate objects and arrays are constructed for those formats which can support hierarchical output. For example, we might have output fields called "salutation", "address.city" and "address.postcode". In JSON output these would appear as:
 
     [
         {
@@ -232,7 +232,22 @@ and in XML (with elements named "person") as, for example:
         </person>
     </persons>
 
-In table formats (HTML, CSV, XLSX), the values just appear as consecutive columns headed (when requested) by the dotted name.
+Similarly a field name "people[0].name" might produce
+
+    [
+        {
+            "people": [
+                {
+                    "name": "Jane Doe"
+                }
+            ]
+        },
+        ...
+    ]
+
+In this way multiple columns of a spreadsheet can be distributed as array elements in the output. It isn't currently possible to include arbitrary numbers of array elements.
+
+In table formats (HTML, CSV, XLSX), the values just appear as consecutive columns headed (when requested) by the dotted/indexed name. Column headings are worked out from the field names of the first record.
 
 You can usefully have more than one field with the same name (usually consecutive), providing you set options to omit each in opposite circumstances. For example, say you have debit and credit columns in the original CSV but require a single simple number, positive for credit and negative for debit. So you would make one field from credit and the same field from debit, each of which has the option to omit if blank, and convert to a number, while debit also includes the option to negate when converting to a number.
 
