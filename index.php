@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>jcomma: a CSV converter</title>
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,700,700i" rel="stylesheet">
-<link rel='stylesheet' href='jcomma.css'>
+<link rel='stylesheet' href='jcomma.css?v=32'>
 <link rel='stylesheet' href='jquery-ui-1.12.1/jquery-ui.css'>
 <link rel='shortcut icon' href='logo.png'>
 <script src='jquery-3.1.0.min.js'></script>
@@ -45,11 +45,13 @@
 
   <hr>
 
-  <div>
+  <div id='iloadsave'>
 	<div class='cloadrecipeoptions'>
 	  <div>
 		<strong>Load recipe</strong> from file <a class='chelp cinfo' href='help.php?a=hloadrecipe'></a>:
 		<input type='file' id='iloadrecipe'><br>
+		<span>or</span> load recipe from cloud URL <a class='chelp cinfo' href='help.php?a=hloadrecipe'></a>:
+		<input type='text' id='iloadrecipeurl'><br>
 		<span>or</span> paste recipe here:<br>
 		<textarea id='ipasterecipe'></textarea>
 	  </div>

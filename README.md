@@ -26,6 +26,12 @@ See also [installation](#hinstallation).
 
 Fill in the form and click **Do It!**. Each reload of the page remembers the recipe for interpreting the CSV file, and you can also save and restore a recipe from file or browser storage.
 
+If you give a URL to a recipe on the web, jcomma will load that rather than the most recently used. For example:
+
+    https://jcomma.savesnine.info/?recipe=https%3A%2F%2Fexample.com%2Fsome_recipe.json  
+
+which means you can share a recipe efficiently. (If you put it in Google Drive or Dropbox, we'll convert the link they give you when you share the file to one which is directly download-able). Don't forget that the second URL must be percent-encoded when used as a parameter in the main URL (you can do that most easily by loading it in the box provided and then copying the URL)
+
 (#huseapi)
 ### Via API
 
@@ -66,6 +72,8 @@ The result is written to standard output. recipe.json is the file containing a j
 ## Load recipe
 
 You can load the recipe previously saved with the link at the bottom of the page (or prepared elswhere) by opening the JSON file with the **choose file** button here. In Chrome you can just drop the file onto the button.
+
+You can also load the recipe from the cloud by providing a URL. If successful, the URL is included in the address of the page, so you can distribute that URL to share the recipe pre-loaded in jcomma. Note that shared Google Drive and Dropbox URLs would normally take you to a download page, but jcomma converts these so they can be loaded directly from the sharing URL provided by these apps.
 
 Alternatively, copy the JSON and paste it into the box provided.
 

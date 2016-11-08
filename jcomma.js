@@ -225,6 +225,12 @@ $(function(){
 		}
 	});
 
+	$("#iloadrecipeurl").change(function(e){
+		var encodedurl = encodeURIComponent($(this).val());
+		window.history.pushState({}, "", ".?recipe="+encodedurl);
+		getcloudrecipejson(encodedurl);
+	});
+
 	$("#ipasterecipe").change(function(e1){
 		/* load recipe from contents */		
 		loadrecipe($(this).val());
@@ -234,8 +240,34 @@ $(function(){
 	$("#icopyrecipe,#ipasterecipe").focus(function(){
 		$(this).select();
 	});
+
+	function getcloudrecipejson(encodedurl){
+		$.ajax("/corsproxy.php?recipe="+encodedurl, {
+			dataType: "json",
+			method: 'GET',
+			success: function(j){
+				loadrecipe(JSON.stringify(j));
+				saverecipe();
+			},
+			error: function(xhr, s, err){ alert("cannot fetch recipe from your given recipe URL"); }
+		});		
+	}
 	
 	/* reload automatically from any previous use (except for the CSV file itself) */
-	if ("currentRecipe" in localStorage) { loadrecipe(getlocalrecipejson(localStorage.currentRecipe)); }
+	var fromURL = false;
+	if (window.location.href.indexOf('?') !== -1) {		
+		var ps = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+		$.each(ps, function(idx, p){
+			var kv = p.split("=");
+			if (kv[0] != "recipe") { return; }
+			fromURL = true;
+			$("#iloadrecipeurl").val(decodeURIComponent(kv[1]));
+			getcloudrecipejson(kv[1]);
+			return false;
+		});
+	}
+	if (! fromURL && ("currentRecipe" in localStorage)) {
+		loadrecipe(getlocalrecipejson(localStorage.currentRecipe));
+	}
 	recipeselectoptions();
 });

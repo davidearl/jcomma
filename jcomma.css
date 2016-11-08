@@ -152,6 +152,13 @@ select {
 	margin: 10px 0;
 }
 
+#isubmission {
+	background: #e2f9e2;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
 #icsv {
 	font-size: 120%;
 	margin: 5px;
@@ -232,6 +239,13 @@ a {
 	box-sizing: border-box;
 	width: 49%;
 	vertical-align: top;
+}
+
+#iloadsave {
+	width: 100%;
+	box-sizing: border-box;
+	background: #f9ffd3;
+	padding: 10px;
 }
 
 .csaverecipeoptions {
