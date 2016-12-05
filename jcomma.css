@@ -113,6 +113,11 @@ input[type=text] {
 	text-align: right;
 }
 
+.ccontrolchar {
+	text-align: center;
+	margin-right: 10px;
+}
+
 .csubmission {
 	display: inline-block;
 }
@@ -162,6 +167,12 @@ select {
 #icsv {
 	font-size: 120%;
 	margin: 5px;
+}
+
+#icsvpaste {
+    vertical-align: text-top;
+	width: 250px;
+	height: 30px;
 }
 
 a {

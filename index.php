@@ -37,7 +37,10 @@
   <div>
 	<form id='isubmission' action='jcomma.php' class='csubmission' method='POST' target='_blank' enctype='multipart/form-data'>
 	  <label for='icsv'><strong>CSV File</strong>:</label> <a class='chelp cinfo' href='help.php?a=hcsv'></a>
-	  <input type='file' id='icsv' name='csv'><br>
+	  <input type='file' id='icsv' name='csv'>
+      <strong>or</strong> <label for='icsvpaste'>paste CSV content here: <a class='chelp cinfo' href='help.php?a=hcsvpaste'></a></label>
+      <textarea id='icsvpaste' name='csvpaste'></textarea>
+      <br>
 	  <input type='hidden' id='isendrecipe' name='recipe'>
 	  <input type='submit' id='isubmit' value='Do it!'>
 	</form>
@@ -186,6 +189,16 @@
 	<div class='csection coptions clevel1'>
 	  <label for='irowcount'>Each record formed from </label> 
 	    <input type='text' class='cshortinput cint cinput cinput1' id='irowcount' name='rowCount' pattern='[0-9]+' title='digits only' value='1'> rows of the CSV <a class='chelp cinfo' href='help.php?a=hrowcount'></a>
+	</div>
+
+	<div class='csection coptions clevel1'>
+	  <label for='idelimiter'>Delimiter </label> 
+	    <input type='text' class='cshortinput ccontrolchar cinput cinput1' id='idelimiter' name='delimiterChar' value=',' pattern='.' title='one character only'>
+	    or <input type='checkbox' class='cshortinput' id='idelimitertab'> tab
+         <a class='chelp cinfo' href='help.php?a=hdelimiter'></a><br>
+	  <label for='ienclosure'>Enclosing character </label> 
+	    <input type='text' class='cshortinput ccontrolchar cinput cinput1' id='ienclosure' name='enclosureChar' value='"' pattern='.' title='one character only'>
+      <a class='chelp cinfo' href='help.php?a=henclosure'></a>
 	</div>
 
 	<div class='csection coptions clevel1'>

@@ -110,6 +110,14 @@ $(function(){
 		loadrecipe(defaultrecipe);
 		recipeselectoptions();
 	});
+
+	$("#idelimitertab").change(function(e){
+		$("#idelimiter").val($(this).is(":checked") ? "\t" : ",");
+		saverecipe();
+	});
+	$("#idelimiter").change(function(e){
+		$("#idelimitertab").prop({checked: $(this).val() == "\t"});
+	});
 	
 	function recurse(level, jel){
 		/* use the DOM structure to create a corresponding JSON object to send to the API */
@@ -133,13 +141,18 @@ $(function(){
 		   contains an input type file, and add to that the single
 		   hidden field for the JSON recipe which says how to interpret
 		   the file */
-		if ($("#icsv").val() == "") {
+		if ($("#icsv").val() == "" && $("#icsvpaste").val() == "") {
 			e.preventDefault();
 			alert("you need to choose a csv file to process");
 			return;
+		} else if ($("#icsv").val() != "" && $("#icsvpaste").val() != "") {
+			e.preventDefault();
+			alert("choose either a csv file to process or paste one, but not both (to clear a previously chosen file, click Choose file, then Cancel)");
+			return;
 		}
+
 		$("#isendrecipe").val(makerecipe());
-		// and continue to submit
+		// and continue to submit		
 	});
 
 	$("#isaverecipe").click(function(){
@@ -192,9 +205,12 @@ $(function(){
 		/* given a recipe JSON string, set the form fields correspondingly */
 		$("#iform .cremove").each(function(idx,el) { $(el).closest(".cgroup").remove(); });
 		var recipe = JSON.parse(recipejson);
-		if (! ("recipeName" in recipe)) { recipe.recipeName = "(anonymous)"; }
 		if (! recipe) { return; }
+		if (! ("recipeName" in recipe)) { recipe.recipeName = "(anonymous)"; }
+		if (! ("delimiterChar" in recipe)) { recipe.delimiterChar = ','; }
+		if (! ("enclosureChar" in recipe)) { recipe.enclosureChar = '"'; }
 		$.each(recipe, function(k, v){ populate(k, v, $("#iform")); });
+		$("#idelimitertab").prop({checked: $("#idelimiter").val() == "\t"});
 		toggleqif();
 		sorting();
 		$("#icopyrecipe").val(recipejson);

@@ -154,6 +154,11 @@ jcomma can write its result in a variety of formats (`"outputFormat": "json"` fo
 
 Select the CSV file to process. In Chrome you can just drag and drop the file onto the Choose File button. Everything that follows then describes how that CSV file should be interpreted to convert it to output records (which are then formatted according to the chosen file format and options).
 
+(#hcsvpaste)
+### Paste CSV
+
+Instead of choosing a CSV file to be processed, you can paste the data into the box provided. This is most useful when the data source is a table in a web page, which you can then copy and paste directly. In this case, the copy puts a TAB character between each cell, not a comma, so you will need also to set the [delimiter character](#hdelimiter) to Tab.
+
 (#hencoding)
 ### Input CSV encoding
 
@@ -176,6 +181,22 @@ If header rows is 1 or more, the last of them is assumed to contain column headi
 When the CSV file is processed, typically each row is used to create one (or sometimes more) output records. However, sometimes a record might be formed from a group of rows if the data has been spread over more than one row.
 
 This number (`"rowCount": 1` for example [in the recipe](#hrecipe)) says how many rows to consume (after any rows that are ignored below have been discarded) to construct each record (or group of records). 1 is typical.
+
+(#hdelimiter)
+### Delimiter
+
+Fields in the CSV are expected to be separated by this character (`"delimiterChar": ","` for example [in the recipe](#hrecipe)), usually a comma. If you have tab-separated columns, check the "tab" box (as you can't easily type a tab as the character). HTML tables pasted as plain text are tab-separated, so if you copy a table off a web page and paste it into the [paste csv box](#csvpaste), setting the delimiter to TAB, it should be possible to process data without saving it to a spreadsheet first.
+
+(#henclosure)
+### Enclosing character
+
+Mostly, fields in a CSV file are just listed verbatim, but those which need to include the delimiter character (e.g. a comma) need to be enclosed by a pair of these characters (`"enclosureChar": "\""` for example [in the recipe](#hrecipe)), usually a double quote. Where an enclosed field also contains the enclosure character, it needs to be doubled. For example, with a conventional double quote we might have
+
+       ...,"This field has a "" symbol",...
+
+Or if the delimiter is a slash character and needs to include a single slash:
+
+       ...,/This field has a // symbol/,...
 
 (#hignorerows)
 ### Ignore rows...

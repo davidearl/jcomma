@@ -184,6 +184,17 @@ class jcomma {
     $this->checkint(array('rowCount'), 1, 1);
     $this->checkstring(array('encoding'), NULL, FALSE, 'auto');
 
+    $v = $this->checkstring(array('delimiterChar'), NULL, TRUE, ',');
+    if (strlen($v) > 1) {
+      $this->errors[] = $this->describefield(array('delimiterChar'),
+                                             ' is too long (only 1 character allowed)');
+    }
+    $v = $this->checkstring(array('enclosureChar'), NULL, TRUE, '"');
+    if (strlen($v) > 1) {
+      $this->errors[] = $this->describefield(array('enclosureChar'),
+                                             ' is too long (only 1 character allowed)');
+    }
+    
     $this->checkarray(array('ignoreRows'), array());
     for($i = 0; $i < count($this->recipe->ignoreRows); $i++) {
       $this->checkstring(array('ignoreRows', $i, 'item'), array('column', 'field'));
@@ -357,7 +368,8 @@ class jcomma {
   function readrows($n, $exact=FALSE){
     $rows = array();
     for($i = 0; $i < $n; $i++) {
-      $row = fgetcsv($this->fd);
+      $row = fgetcsv($this->fd, NULL,
+                     $this->recipe->delimiterChar, $this->recipe->enclosureChar);
       $this->currentrow++;
       if ($row === FALSE) { return FALSE; }
       if (! $exact) {

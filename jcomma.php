@@ -31,23 +31,29 @@ try {
   if ($recipe === FALSE) { oops('recipe is not valid JSON'); }
 
   if (! $cl) {
-    if (empty($_FILES['csv']['name'])) { oops("no file uploaded"); }
-    $filename = $_FILES['csv']['name'];
-    if (! preg_match('~\\.(csv)$~i', $filename, $m)) { oops("only .csv files allowed"); }
+    if (! empty($_FILES['csv']['name'])) {
+      $filename = $_FILES['csv']['name'];
+      if (! preg_match('~\\.(csv)$~i', $filename, $m)) { oops("only .csv files allowed"); }
 
-    switch ($_FILES['csv']['error']) {
-    case UPLOAD_ERR_OK:
-      break;
-    case UPLOAD_ERR_NO_FILE:
-      oops('No file sent');
-    case UPLOAD_ERR_INI_SIZE:
-    case UPLOAD_ERR_FORM_SIZE:
-      oops('Exceeded filesize limit');
-    default:
-      oops('Unknown error');
-    }  
+      switch ($_FILES['csv']['error']) {
+      case UPLOAD_ERR_OK:
+        break;
+      case UPLOAD_ERR_NO_FILE:
+        oops('No file sent');
+      case UPLOAD_ERR_INI_SIZE:
+      case UPLOAD_ERR_FORM_SIZE:
+        oops('Exceeded filesize limit');
+      default:
+        oops('Unknown error');
+      }
+      $path = $_FILES['csv']['tmp_name'];
+    } else if (! empty($_POST['csvpaste'])) {
+      $path = fopen('data://text/plain,'.$_POST['csvpaste'], 'r');
+      $filename = 'pasted.csv';
+    } else {
+      oops("no file uploaded");
+    }
 
-    $path = $_FILES['csv']['tmp_name'];  
   }
   
   $jcomma = new jcomma($path, $recipe);
@@ -63,6 +69,7 @@ try {
     header("HTTP/1.1 400 Bad Request");
     header('Content-type: application/json');
     echo json_encode(explode("\n", $e->getMessage()));
+    if (! empty($_FILES['csv'])) { unlink($_FILES['csv']['tmp_name']); }
     exit;
   } else {    
     fwrite(STDERR, $e->getMessage());
