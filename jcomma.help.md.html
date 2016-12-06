@@ -1,6 +1,8 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><title>jcomma.help.md</title><style></style></head><body id="preview">
 <h1><a id="logohttpsjcommasavesnineinfologosvg_jcomma_help_0"></a><img src="https://jcomma.savesnine.info/logo.svg" alt="logo"> jcomma: help</h1>
-<p>jcomma converts CSV files to other formats and sanitizes them so that they are not subject to the vagaries of the generator of the CSV. <strong>Live version at <a href="https://jcomma.savesnine.info">https://jcomma.savesnine.info</a></strong></p>
+<p>jcomma converts CSV (and TSV) files to other formats and sanitizes them so that they are not subject to the vagaries of the generator of the CSV.</p>
+<p><strong>Live version at <a href="https://jcomma.savesnine.info">https://jcomma.savesnine.info</a></strong></p>
+<p>CSV is a truly terrible format for data interchange, especially internationally. Yet, it is still ubiquitous in all sorts of scenarios, and it is popular because it is fairly easy for non-programmers to understand (partly because it glosses over the problems!) so we often have to deal with such files when we’d rather not.</p>
 <p>For example, banks frequently generate CSVs with:</p>
 <ul>
 <li>interleaved headers every few entries,</li>
@@ -10,28 +12,30 @@
 <li>parentheses or trailing minus signs as negatives where ordinary mortals would put a normal negative,</li>
 <li>positive values (e.g. deposits) in one column and negatives in another (e.g. withdrawals) where you just want a single number which is positive or negative.</li>
 </ul>
-<p>Furthermore, CSV files don’t have any means to indicate what<br>
-character set encoding they use, and very often Excel - or the<br>
-person who used Excel to send it to you - produces one (typically<br>
-Windows) and your consumer needs another (often UTF-8). Particularly<br>
-a problem with things like £ signs.</p>
-<h2><a id="Usage_19"></a>Usage</h2>
+<p>Furthermore, CSV files don’t have any means to indicate what character set encoding they use, and very often Excel - or the person who used Excel to send it to you - produces one (typically Windows) and your consumer needs another (often UTF-8). Particularly a problem with things like £ signs.</p>
+<p>jcomma addresses these problems, especially when you encounter files laid out the same way repeatedly.</p>
+<h2><a id="Usage_20"></a>Usage</h2>
 <p>See also <a href="#hinstallation">installation</a>.</p>
 <p>(#husewebapp)</p>
-<h3><a id="As_a_web_app_24"></a>As a web app</h3>
+<h3><a id="As_a_web_app_25"></a>As a web app</h3>
 <p>Fill in the form and click <strong>Do It!</strong>. Each reload of the page remembers the recipe for interpreting the CSV file, and you can also save and restore a recipe from file or browser storage.</p>
 <p>If you give a URL to a recipe on the web, jcomma will load that rather than the most recently used. For example:</p>
 <pre><code>https://jcomma.savesnine.info/?recipe=https%3A%2F%2Fexample.com%2Fsome_recipe.json  
 </code></pre>
 <p>which means you can share a recipe efficiently. (If you put it in Google Drive or Dropbox, we’ll convert the link they give you when you share the file to one which is directly download-able). Don’t forget that the second URL must be percent-encoded when used as a parameter in the main URL (you can do that most easily by loading it in the box provided and then copying the URL)</p>
 <p>(#huseapi)</p>
-<h3><a id="Via_API_35"></a>Via API</h3>
-<p>Do a multipart-encoded POST to /jcomma.php, providing the CSV file as ‘csv’ and the recipe as ‘recipe’, a JSON string encoding all the options, &lt;a href=’#hrecipe’&gt;as shown below&lt;/a&gt;, in a single POST parameter. For example:</p>
+<h3><a id="Via_API_36"></a>Via API</h3>
+<p>Either:</p>
+<ul>
+<li>do a multipart-encoded POST to /jcomma.php, providing the CSV file as ‘csv’ and the recipe as ‘recipe’, a JSON string encoding all the options, <a href="#hrecipe">as shown below</a>, in a single POST parameter; or</li>
+<li>do a POST (which doesn’t have to be multipart-encoded) with ‘recipe’ as above and ‘csvpaste’ as the CSV data as a POST parameter (suitably encoded, of course).</li>
+</ul>
+<p>For example:</p>
 <pre><code>curl -F &quot;recipe=@recipe.json&quot; -F &quot;csv=@my.csv&quot; &quot;https://jcomma.savesnine.info/jcomma.php&quot;
 </code></pre>
 <p>You can use the web app to make a recipe file, save it, and then use that programatically; or make one on the fly.</p>
 <p>(#huselibrary)</p>
-<h3><a id="As_a_library_44"></a>As a library</h3>
+<h3><a id="As_a_library_50"></a>As a library</h3>
 <p>To use as a library include jcomma.class.php in your PHP application, and use like this:</p>
 <pre><code>$j = new jcomma($pathtocsv, $recipeobject /* not JSON: already decoded */);
 $errors = $j-&gt;validate(); // produces array of error message strings, or empty array if recipe is OK
@@ -40,49 +44,47 @@ if (empty($errors)) {
     $jcomma-&gt;output($result, $filename, $cl); /* optional: if you want to actually emit a file or string */
 }
 </code></pre>
-<p>$recipe-&gt;outputTo can be set to ‘string’ (unlike when used via the API), when it<br>
-is converted to the output format but returned as a<br>
-string rather than emitted to stdout. $cl=TRUE (“command line”) is optional, and omits all headers</p>
+<p>$recipe-&gt;outputTo can be set to ‘string’ (unlike when used via the API), when it is converted to the output format but returned as a string rather than emitted to stdout. $cl=TRUE (“command line”) is optional, and omits all headers</p>
 <p>(#huseshell)</p>
-<h3><a id="In_a_shell_command_line_60"></a>In a shell command line</h3>
+<h3><a id="In_a_shell_command_line_64"></a>In a shell command line</h3>
 <p>Like this, for example:</p>
 <pre><code>php jcomma.php -s recipe.json my.csv
 </code></pre>
-<p>The result is written to standard output. recipe.json is the file containing a json representation of the options, &lt;a href=’#hrecipe’&gt;as shown below&lt;/a&gt;. If the input csv path is ‘-’ or omitted, it is read from standard input, so the command can be used in a pipe:</p>
+<p>The result is written to standard output. recipe.json is the file containing a json representation of the options, <a href="#hrecipe">as shown below</a>. If the input csv path is ‘-’ or omitted, it is read from standard input, so the command can be used in a pipe:</p>
 <pre><code>echo my.csv | php jcomma.php -s recipe.json &gt; my.xml
 </code></pre>
 <p>(#hloadrecipe)</p>
-<h2><a id="Load_recipe_71"></a>Load recipe</h2>
+<h2><a id="Load_recipe_75"></a>Load recipe</h2>
 <p>You can load the recipe previously saved with the link at the bottom of the page (or prepared elswhere) by opening the JSON file with the <strong>choose file</strong> button here. In Chrome you can just drop the file onto the button.</p>
 <p>You can also load the recipe from the cloud by providing a URL. If successful, the URL is included in the address of the page, so you can distribute that URL to share the recipe pre-loaded in jcomma. Note that shared Google Drive and Dropbox URLs would normally take you to a download page, but jcomma converts these so they can be loaded directly from the sharing URL provided by these apps.</p>
 <p>Alternatively, copy the JSON and paste it into the box provided.</p>
 <p>(#hresetrecipe)</p>
-<h2><a id="Reset_recipe_80"></a>Reset recipe</h2>
+<h2><a id="Reset_recipe_84"></a>Reset recipe</h2>
 <p>Clicking this just resets the page to the simplest possible recipe for you to then exand on (it may be needed since the page remembers each change).</p>
 <p>(#hloadselect)</p>
-<h2><a id="Choose_recipe_85"></a>Choose recipe</h2>
+<h2><a id="Choose_recipe_89"></a>Choose recipe</h2>
 <p>When you give your recipe a name, the browser automatically remembers it using that name, so you can reload it by selecting the name from this menu.</p>
 <p>(#hdeleterecipe)</p>
-<h2><a id="Delete_recipe_90"></a>Delete recipe</h2>
+<h2><a id="Delete_recipe_94"></a>Delete recipe</h2>
 <p>As the browser saves all named recipes separately, there needs to be a way to clear them out. Just load the relevant recipe from the menu and then press the <a href="#hdeleterecipe">delete link</a>.</p>
 <p>(#hsaverecipe)</p>
-<h2><a id="Save_recipe_95"></a>Save recipe</h2>
+<h2><a id="Save_recipe_99"></a>Save recipe</h2>
 <p>All the settings described in the form are saved as a jcomma recipe, a JSON file, to a local file. Note that tghe whole recipe is saved on every change so if the page is reloaded, changes are not lost.</p>
 <p>Alternatively copy the JSON from the box provided to where you need it.</p>
 <p>As well as <a href="#hloadrecipe">restoring them</a> to the page, a saved recipe can be used in automated workflows using jcomma, so that the recipes do not need to be hand written in JSON.</p>
-<h2><a id="Output_settings_103"></a>Output settings</h2>
+<h2><a id="Output_settings_107"></a>Output settings</h2>
 <p>(#hrecipename)</p>
-<h3><a id="Recipe_name_106"></a>Recipe name</h3>
+<h3><a id="Recipe_name_110"></a>Recipe name</h3>
 <p>You can give your recipe a name, for your own reference. Named recipes are stored by the browser so can be retrieved by name.</p>
 <p>(#hcomment)</p>
-<h3><a id="Comment_111"></a>Comment</h3>
+<h3><a id="Comment_115"></a>Comment</h3>
 <p>This is just saved with the recipe so when you look in the file there is something to tell you what it is for. It’s not saved with the output, just with <a href="#hrecipe">the recipe</a>.</p>
 <p>(#houtputto)</p>
-<h3><a id="Output_to_116"></a>Output to</h3>
+<h3><a id="Output_to_120"></a>Output to</h3>
 <p>Choose whether to save the output to a downloaded file or to display it in a browser tab. Note that csv and xlsx files are always downloaded (because browsers don’t know what to do with them).</p>
 <p>This corresponds to the <code>&quot;outputTo&quot;: &quot;...&quot;</code> <a href="#hrecipe">in the recipe</a>, with values ‘inline’ (for display) and ‘attachment’ (for download), and when used as the library ‘string’ to retrieve the result as a string.</p>
 <p>(#houtputformat)</p>
-<h3><a id="Output_format_123"></a>Output format</h3>
+<h3><a id="Output_format_127"></a>Output format</h3>
 <p>jcomma can write its result in a variety of formats (<code>&quot;outputFormat&quot;: &quot;json&quot;</code> for example <a href="#hrecipe">in the recipe</a>). Some of these have additional options:</p>
 <ul>
 <li>
@@ -134,57 +136,59 @@ string rather than emitted to stdout. $cl=TRUE (“command line”) is optional,
 </ul>
 </li>
 </ul>
-<h2><a id="Input_settings_149"></a>Input settings</h2>
+<h2><a id="Input_settings_153"></a>Input settings</h2>
 <p>(#hcsv)</p>
-<h3><a id="CSV_file_152"></a>CSV file</h3>
+<h3><a id="CSV_file_156"></a>CSV file</h3>
 <p>Select the CSV file to process. In Chrome you can just drag and drop the file onto the Choose File button. Everything that follows then describes how that CSV file should be interpreted to convert it to output records (which are then formatted according to the chosen file format and options).</p>
 <p>(#hcsvpaste)</p>
-<h3><a id="Paste_CSV_157"></a>Paste CSV</h3>
+<h3><a id="Paste_CSV_161"></a>Paste CSV</h3>
 <p>Instead of choosing a CSV file to be processed, you can paste the data into the box provided. This is most useful when the data source is a table in a web page, which you can then copy and paste directly. In this case, the copy puts a TAB character between each cell, not a comma, so you will need also to set the <a href="#hdelimiter">delimiter character</a> to Tab.</p>
 <p>(#hencoding)</p>
-<h3><a id="Input_CSV_encoding_162"></a>Input CSV encoding</h3>
+<h3><a id="Input_CSV_encoding_166"></a>Input CSV encoding</h3>
 <p>CSV files are completely ambiguous when it comes to characters that aren’t represented in the basic ASCII character set, such as accented characters, currency symbols and exotic punctuation, not to mention whole languages like Japanese and Hebrew. While Excel does have an option to choose the character set when it is saved, most people do not know about it and are completely unaware of the consequences, namely that a consumer of the CSV may not see currency symbols or non-English names correctly. Typically Excel exports CSVs using a special Windows character set, while Google Sheets does so using the standard international character set called UTF-8.</p>
 <p>This option (<code>&quot;encoding&quot;: &quot;whatever&quot;</code> <a href="#hrecipe">in the recipe</a>) lets you explicitly state which character set to expect in the CSV (we will try to detect this when set to auto, but it is not always possible to be correct).</p>
 <p>(#hheaderrows)</p>
-<h3><a id="Header_rows_169"></a>Header rows</h3>
+<h3><a id="Header_rows_173"></a>Header rows</h3>
 <p>Many CSV files have a header row labelling the columns. Some CSV files have additional header rows where people put arbitrary data (for example, a bank statement CSV might use one line for the account number, and another for the sort code).</p>
 <p>Specify the number of header rows in the CSV here (<code>&quot;headerRows&quot;: 1</code> for example <a href="#hrecipe">in the recipe</a>). Zero means there is no header row at all, while 1 is common.</p>
 <p>If header rows is 1 or more, the last of them is assumed to contain column headings, and these can be used to identify columns instead or as well as column letters. This can make the settings easier to follow. Column headings and letters are not treated as case-sensitive. Also note that conventionally the 27th and subsequent columns are “AA”, “AB”, “AC” etc, and the 53rd “BA”, “BB”, “BC”, and so on, as in Excel.</p>
 <p>(#hrowcount)</p>
-<h3><a id="Each_record_formed_from__rows_178"></a>Each record formed from … rows</h3>
+<h3><a id="Each_record_formed_from__rows_182"></a>Each record formed from … rows</h3>
 <p>When the CSV file is processed, typically each row is used to create one (or sometimes more) output records. However, sometimes a record might be formed from a group of rows if the data has been spread over more than one row.</p>
 <p>This number (<code>&quot;rowCount&quot;: 1</code> for example <a href="#hrecipe">in the recipe</a>) says how many rows to consume (after any rows that are ignored below have been discarded) to construct each record (or group of records). 1 is typical.</p>
 <p>(#hdelimiter)</p>
-<h3><a id="Delimiter_185"></a>Delimiter</h3>
-<p>Fields in the CSV are expected to be separated by this character (<code>&quot;delimiterChar&quot;: &quot;,&quot;</code> for example <a href="#hrecipe">in the recipe</a>), usually a comma. If you have tab-separated columns, check the “tab” box (as you can’t easily type a tab as the character). HTML tables pasted as plain text are tab-separated, so if you copy a table off a web page and paste it into the <a href="#csvpaste">paste csv box</a>, setting the delimiter to TAB, it should be possible to process data without saving it to a spreadsheet first.</p>
+<h3><a id="Delimiter_189"></a>Delimiter</h3>
+<p>Columns in the CSV are expected to be separated by this character (<code>&quot;delimiterChar&quot;: &quot;,&quot;</code> for example <a href="#hrecipe">in the recipe</a>), usually a comma. If you have tab-separated columns (aka a TSV file), check the “tab” box (as you can’t easily type a tab character).</p>
+<p>HTML tables copied and pasted as plain text are usually tab-separated, so if you copy a table off a web page and paste it into the <a href="#csvpaste">paste csv box</a>, setting the delimiter to TAB, it should be possible to process data without saving it to a spreadsheet first.</p>
 <p>(#henclosure)</p>
-<h3><a id="Enclosing_character_190"></a>Enclosing character</h3>
-<p>Mostly, fields in a CSV file are just listed verbatim, but those which need to include the delimiter character (e.g. a comma) need to be enclosed by a pair of these characters (<code>&quot;enclosureChar&quot;: &quot;\&quot;&quot;</code> for example <a href="#hrecipe">in the recipe</a>), usually a double quote. Where an enclosed field also contains the enclosure character, it needs to be doubled. For example, with a conventional double quote we might have</p>
+<h3><a id="Enclosing_character_196"></a>Enclosing character</h3>
+<p>Mostly, column data in a CSV file is just listed verbatim, but columns which need to include the delimiter character (e.g. a comma) need to be enclosed by a pair of these characters (<code>&quot;enclosureChar&quot;: &quot;\&quot;&quot;</code> for example <a href="#hrecipe">in the recipe</a>), usually a double quote. This setting allows you to change that character - if the file uses a single quote for example.</p>
+<p>Where an enclosed field also contains the enclosure character, it needs to be doubled. For example, with a conventional double quote we might have</p>
 <pre><code>   ...,&quot;This field has a &quot;&quot; symbol&quot;,...
 </code></pre>
 <p>Or if the delimiter is a slash character and needs to include a single slash:</p>
 <pre><code>   ...,/This field has a // symbol/,...
 </code></pre>
 <p>(#hignorerows)</p>
-<h3><a id="Ignore_rows_201"></a>Ignore rows…</h3>
+<h3><a id="Ignore_rows_209"></a>Ignore rows…</h3>
 <p>People will often put random rows in the middle of CSVs which makes them particularly hard to process in an orderly manner. For example, banks often repeat their a header row every “page”, whatever that might mean.</p>
 <p>This setting (<code>&quot;ignoreRows&quot;: [ ... ]</code> <a href="#hrecipe">in the recipe</a>) lets you ignore such rows based on one or more criteria. Add a new criterion by pressing the + button, remove an existing one with X, and drag ↕ to change the order. The row is ignored if any one of the criteria is satisfied.</p>
 <p>You can ignore rows based on the value of a cell in a specified column in the incoming CSV (provide its name, either the column letter or column heading), or based on the value of one of the fields computed from the incoming CSV (provide its name to match one you specify below).</p>
 <p>See <a href="#hconditions">conditions</a> for details about the conditions (the same set of conditions is used in several different places).</p>
 <p>Note that rows are not ignored in this way when extracting any header row(s) (where exactly the number given are consumed from the CSV).</p>
 <p>(#hrecords)</p>
-<h2><a id="Output_records_214"></a>Output records</h2>
+<h2><a id="Output_records_222"></a>Output records</h2>
 <p>Typically you’ll produce one output record for each input row (that isn’t ignored according to <a href="#hignorerows">ignore rows</a>) or group of however many rows given by <a href="#hrowcount">‘Each record formed from…’</a>. However, occasionally it may be helpful to make more than one record for each row. Each such record would appear consecutively in the output, e.g. as an object in a JSON array or an extra row in an output CSV.</p>
 <p>For example, you might produce two records from a PayPal transaction where you want to represent a payment as one record (a credit), and the PayPal fee (which PayPal puts in the same row in its exports) as another (a debit: a bank charge).</p>
 <p>Therefore, the + here lets you add one or more recipes of records to be produced, though you’ll often only need one. (<code>&quot;records&quot;: [ ... ]</code> <a href="#hrecipe">in the recipe</a>). Click X to remove one, and drag ↕ to change the order</p>
 <p>Each record then comprises a set of fields, and a set of conditions based on those fields when the record will be discarded.</p>
 <p>(#hfields)</p>
-<h2><a id="Fields_of_output_record_225"></a>Fields of output record</h2>
+<h2><a id="Fields_of_output_record_233"></a>Fields of output record</h2>
 <p>Each field (<code>&quot;fields&quot;: [ ... ]</code> <a href="#hrecipe">in the recipe</a>) of a record comprises a name, one or more columns and bits of verbatim text from which its value is initially composed, and a list of options applied in turn which can transform, omit or reject the value.</p>
 <p>Add a new field with +, delete an existing one with X, and drag ↕ to change the order</p>
 <p>Fields are delivered in the order they are specified in the output records.</p>
 <p>(#hname)</p>
-<h3><a id="Field_name_234"></a>Field name</h3>
+<h3><a id="Field_name_242"></a>Field name</h3>
 <p>Field names (<code>&quot;name&quot;: &quot;whatever&quot;</code> <a href="#hrecipe">in the recipe</a>) is used in the output, for example as object member names in JSON, as element names in XML or column headings in CSV, HTML and XLSX.</p>
 <p>If names contain periods and/or integers in square brackets, then subordinate objects and arrays are constructed for those formats which can support hierarchical output. For example, we might have output fields called “salutation”, “address.city” and “address.postcode”. In JSON output these would appear as:</p>
 <pre><code>[
@@ -224,10 +228,10 @@ string rather than emitted to stdout. $cl=TRUE (“command line”) is optional,
 <p>In this way multiple columns of a spreadsheet can be distributed as array elements in the output. It isn’t currently possible to include arbitrary numbers of array elements.</p>
 <p>In table formats (HTML, CSV, XLSX), the values just appear as consecutive columns headed (when requested) by the dotted/indexed name. Column headings are worked out from the field names of the first record.</p>
 <p>You can usefully have more than one field with the same name (usually consecutive), providing you set options to omit each in opposite circumstances. For example, say you have debit and credit columns in the original CSV but require a single simple number, positive for credit and negative for debit. So you would make one field from credit and the same field from debit, each of which has the option to omit if blank, and convert to a number, while debit also includes the option to negate when converting to a number.</p>
-<h3><a id="dont_include_in_output_282"></a>don’t include in output</h3>
+<h3><a id="dont_include_in_output_290"></a>don’t include in output</h3>
 <p>(<code>&quot;exclude&quot;: true</code> <a href="#hrecipe">in the recipe</a>) excludes the field from the output altogether. This differs from the “omit” conditions in that the field remains in the output record until it is output and is therefore available to be referenced from other fields. In this way, it behaves a bit like a variable.</p>
 <p>(#hcomprising)</p>
-<h3><a id="Field_concatenated_from_287"></a>Field concatenated from</h3>
+<h3><a id="Field_concatenated_from_295"></a>Field concatenated from</h3>
 <p>Concatenate several columns, interleaved with verbatim separators, to make one output field, before applying any options. For example, some banks provide several fields which one might usefully put into a single Description field. You would almost always need at least one column. (<code>&quot;comprising&quot;: [{&quot;item&quot;: &quot;column&quot;, &quot;column&quot;: &quot;A&quot;, ...}, ...]</code> <a href="#hrecipe">in the recipe</a></p>
 <p>Where there is more than one input row (<a href="#hrowcount">rowCount</a> is greater than 1), you’ll need to say from which of those rows the CSV cell is obtained (this also allows you to concatenate several values vertically from the same column), by giving the row offset (0 for the first row, 1 for the second in each group of rows, and  so on).</p>
 <p>You can also include verbatim text, for example to parenthesis a second column. (<code>&quot;comprising&quot;: [{&quot;item&quot;: &quot;text&quot;, &quot;text&quot;: &quot;whatever text&quot;}, ...]</code> <a href="#hrecipe">in the recipe</a>).</p>
@@ -235,7 +239,7 @@ string rather than emitted to stdout. $cl=TRUE (“command line”) is optional,
 <p>For fields and columns, check boxes are available to append comma (<code>&quot;appendComma&quot;: true</code> <a href="#hrecipe">in the recipe</a>), space (<code>&quot;appendSpace&quot;: true</code> <a href="#hrecipe">in the recipe</a>) or both. This is jsut a shortcut for including these as verbatim text.</p>
 <p>Click + to include a new column, field or text, X to remove one, and drag ↕ to change the order</p>
 <p>(#hoptions)</p>
-<h3><a id="Field_options_302"></a>Field options</h3>
+<h3><a id="Field_options_310"></a>Field options</h3>
 <p>After a field value is derived by concatenation from one or more cells in the CSV, that value can be transformed in a variety of ways using field options. More than one option can be applied, in the order they are given. Click + to add a new option, X to delete an existing one, and drag ↕ to change the order.</p>
 <p>Available options are as follows:</p>
 <ul>
@@ -280,11 +284,11 @@ string rather than emitted to stdout. $cl=TRUE (“command line”) is optional,
 <li>the value of any earlier field (<code>&quot;test&quot;: &quot;field&quot;, &quot;field&quot;: &quot;name&quot;</code> <a href="#hrecipe">in the recipe</a>)</li>
 </ul>
 <p>(#hunless)</p>
-<h3><a id="Dont_output_record_337"></a>Don’t output record…</h3>
+<h3><a id="Dont_output_record_345"></a>Don’t output record…</h3>
 <p>Having calculated all the fields for a record, the values computed can be used to determine that their record should not be included in the output at all if any of the <a href="#hconditions">conditions</a> given here are satisfied. Press + to add a new condition, X to remove an existing one, and drag ↕ to change the order.</p>
-<h2><a id="Settings_which_are_used_in_several_places_341"></a>Settings which are used in several places</h2>
+<h2><a id="Settings_which_are_used_in_several_places_349"></a>Settings which are used in several places</h2>
 <p>(#hconditions)</p>
-<h3><a id="Conditions_344"></a>Conditions</h3>
+<h3><a id="Conditions_352"></a>Conditions</h3>
 <ul>
 <li><strong><em>empty (no text at all)</em></strong> (<code>&quot;condition&quot;: &quot;empty&quot;</code> <a href="#hrecipe">in the recipe</a>): there is nothing in the value, not even a space, or for field either the field does not exist or is an empty string.</li>
 <li><strong><em>whitespace only or empty</em></strong> (<code>&quot;condition&quot;: &quot;white&quot;</code> <a href="#hrecipe">in the recipe</a>): if the value is empty, as above, or just contains spaces, tabs, newline or line-feed characters, in any combination.</li>
@@ -298,7 +302,7 @@ string rather than emitted to stdout. $cl=TRUE (“command line”) is optional,
 <li><strong><em>after (date)</em></strong> (<code>&quot;condition&quot;: &quot;after&quot;, &quot;value&quot;: &quot;2016-09-23&quot;</code> <a href="#hrecipe">in the recipe</a>): date comparison, as “before”.</li>
 </ul>
 <p>(#hregularexpression)</p>
-<h3><a id="Regular_expressions_358"></a>Regular expressions</h3>
+<h3><a id="Regular_expressions_366"></a>Regular expressions</h3>
 <p>Regular expressions are a language for expressing the syntax of a string of text. jcomma uses so-called PCRE-regular expressions, <a href="http://php.net/manual/en/book.pcre.php">as in PHP</a>. The regular expression must include the delimiters (any suitable pair of characters) and any trailing modifiers.</p>
 <p>See the <a href="http://php.net/manual/en/book.pcre.php">PHP manual</a> for full details of regular expression syntax.</p>
 <p>For example, the following would match a string comprising only the letters A, B, C or a, b, c (using tilde as the delimiter, the trailing modifier ‘i’ indicating case-independence, ^ and $ requiring start and end of string, and square brackets to indicate a range of characters):</p>
@@ -307,7 +311,7 @@ string rather than emitted to stdout. $cl=TRUE (“command line”) is optional,
 <p>Note that when you need to escape a character, in a PHP string you often find you need two backslashes, one for PHP’s literal string syntax, and another for the regular expression itself. Here, these are not PHP literal strings, so only one is required.</p>
 <p>Where replacement is offered, parenthesised matches can be substituted using $1, $2 etc, just as in PHP.</p>
 <p>(#hrecipe)</p>
-<h2><a id="JSON_recipe_the_recipe_373"></a>JSON recipe (“the recipe”)</h2>
+<h2><a id="JSON_recipe_the_recipe_381"></a>JSON recipe (“the recipe”)</h2>
 <p>The values entered into the form are turned into a JSON object. This can be <a href="#hsaverecipe">saved to a file</a>.</p>
 <p>When used from the <a href="#huseapi">API</a>, as a <a href="#huselibrary">library</a>, or in a <a href="#huseshell">shell command</a>, the recipe is supplied in this structured form. (Yes, I know JSON can’t really have comments like this).</p>
 <pre><code>{
@@ -321,6 +325,8 @@ string rather than emitted to stdout. $cl=TRUE (“command line”) is optional,
     &quot;outXMLElements&quot;: &quot;true&quot;, # &lt;x&gt;&lt;k&gt;v&lt;/k&gt;...&lt;/x&gt; rather than &lt;x k=&quot;v&quot; ...&gt;&lt;/x&gt;
     &quot;encoding&quot;: &quot;UTF-8&quot;,
     &quot;headerRows&quot;: 8,
+    &quot;delimiterChar&quot;: &quot;,&quot;,
+    &quot;enclosureChar&quot;: &quot;\&quot;&quot;,
     &quot;rowCount&quot;: 1, # default 1
     &quot;ignoreRows&quot;: [ # one or more of these (row ignored if any is true):
         {&quot;item&quot;: &quot;column&quot;, &quot;name&quot;: &quot;A&quot;, &quot;condition&quot;: &quot;...&quot;, &quot;value&quot;: &quot;...&quot;}, # conditions as before
@@ -379,11 +385,11 @@ string rather than emitted to stdout. $cl=TRUE (“command line”) is optional,
 }
 </code></pre>
 <p>(#hinstallation)</p>
-<h2><a id="Installation_448"></a>Installation</h2>
+<h2><a id="Installation_458"></a>Installation</h2>
 <p>Requires PHP &gt;= 5.4. Does not work on older browsers (it’s using a recent version of jQuery). It will probably work on PHP 5.3 except for JSON Pretty Print which would produce a warning in the server error log if used.</p>
 <p>Just put the files in the document root of your web server, ideally a https website, or as a sub-directory of a website.</p>
 <p>You might want to increase the individual file and total file upload limits in your server settings from the PHP default.</p>
-<h2><a id="Acknowledgments_456"></a>Acknowledgments</h2>
+<h2><a id="Acknowledgments_466"></a>Acknowledgments</h2>
 <p>Apart from PHP and server software, the only dependencies are</p>
 <ul>
 <li><a href="https://github.com/mk-j/PHP_XLSXWriter">PHP_XLSXWriter</a> for the xlsx file format output, licensed under the MIT license, and</li>

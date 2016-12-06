@@ -1,6 +1,10 @@
 # ![logo](https://jcomma.savesnine.info/logo.svg) jcomma: help
 
-jcomma converts CSV files to other formats and sanitizes them so that they are not subject to the vagaries of the generator of the CSV. **Live version at [https://jcomma.savesnine.info](https://jcomma.savesnine.info)**
+jcomma converts CSV (and TSV) files to other formats and sanitizes them so that they are not subject to the vagaries of the generator of the CSV.
+
+**Live version at [https://jcomma.savesnine.info](https://jcomma.savesnine.info)**
+
+CSV is a truly terrible format for data interchange, especially internationally. Yet, it is still ubiquitous in all sorts of scenarios, and it is popular because it is fairly easy for non-programmers to understand (partly because it glosses over the problems!) so we often have to deal with such files when we'd rather not.
 
 For example, banks frequently generate CSVs with:
 * interleaved headers every few entries,
@@ -10,12 +14,9 @@ For example, banks frequently generate CSVs with:
 * parentheses or trailing minus signs as negatives where ordinary mortals would put a normal negative,
 * positive values (e.g. deposits) in one column and negatives in another (e.g. withdrawals) where you just want a single number which is positive or negative.
 
+Furthermore, CSV files don't have any means to indicate what character set encoding they use, and very often Excel - or the person who used Excel to send it to you - produces one (typically Windows) and your consumer needs another (often UTF-8). Particularly a problem with things like &pound; signs.
 
-Furthermore, CSV files don't have any means to indicate what
-character set encoding they use, and very often Excel - or the
-person who used Excel to send it to you - produces one (typically
-Windows) and your consumer needs another (often UTF-8). Particularly
-a problem with things like &pound; signs.
+jcomma addresses these problems, especially when you encounter files laid out the same way repeatedly.
 
 ## Usage
 
@@ -35,7 +36,12 @@ which means you can share a recipe efficiently. (If you put it in Google Drive o
 (#huseapi)
 ### Via API
 
-Do a multipart-encoded POST to /jcomma.php, providing the CSV file as 'csv' and the recipe as 'recipe', a JSON string encoding all the options, <a href='#hrecipe'>as shown below</a>, in a single POST parameter. For example:
+Either:
+
+* do a multipart-encoded POST to /jcomma.php, providing the CSV file as 'csv' and the recipe as 'recipe', a JSON string encoding all the options, [as shown below](#hrecipe), in a single POST parameter; or
+* do a POST (which doesn't have to be multipart-encoded) with 'recipe' as above and 'csvpaste' as the CSV data as a POST parameter (suitably encoded, of course).
+ 
+For example:
 
     curl -F "recipe=@recipe.json" -F "csv=@my.csv" "https://jcomma.savesnine.info/jcomma.php"
 
@@ -53,9 +59,7 @@ To use as a library include jcomma.class.php in your PHP application, and use li
         $jcomma->output($result, $filename, $cl); /* optional: if you want to actually emit a file or string */
     }
 
-$recipe->outputTo can be set to 'string' (unlike when used via the API), when it
-is converted to the output format but returned as a
-string rather than emitted to stdout. $cl=TRUE ("command line") is optional, and omits all headers
+$recipe->outputTo can be set to 'string' (unlike when used via the API), when it is converted to the output format but returned as a string rather than emitted to stdout. $cl=TRUE ("command line") is optional, and omits all headers
 
 (#huseshell)
 ### In a shell command line
@@ -64,7 +68,7 @@ Like this, for example:
 
     php jcomma.php -s recipe.json my.csv
 
-The result is written to standard output. recipe.json is the file containing a json representation of the options, <a href='#hrecipe'>as shown below</a>. If the input csv path is '-' or omitted, it is read from standard input, so the command can be used in a pipe:
+The result is written to standard output. recipe.json is the file containing a json representation of the options, [as shown below](#hrecipe). If the input csv path is '-' or omitted, it is read from standard input, so the command can be used in a pipe:
 
     echo my.csv | php jcomma.php -s recipe.json > my.xml
 
@@ -185,12 +189,16 @@ This number (`"rowCount": 1` for example [in the recipe](#hrecipe)) says how man
 (#hdelimiter)
 ### Delimiter
 
-Fields in the CSV are expected to be separated by this character (`"delimiterChar": ","` for example [in the recipe](#hrecipe)), usually a comma. If you have tab-separated columns, check the "tab" box (as you can't easily type a tab as the character). HTML tables pasted as plain text are tab-separated, so if you copy a table off a web page and paste it into the [paste csv box](#csvpaste), setting the delimiter to TAB, it should be possible to process data without saving it to a spreadsheet first.
+Columns in the CSV are expected to be separated by this character (`"delimiterChar": ","` for example [in the recipe](#hrecipe)), usually a comma. If you have tab-separated columns (aka a TSV file), check the "tab" box (as you can't easily type a tab character).
+
+HTML tables copied and pasted as plain text are usually tab-separated, so if you copy a table off a web page and paste it into the [paste csv box](#csvpaste), setting the delimiter to TAB, it should be possible to process data without saving it to a spreadsheet first.
 
 (#henclosure)
 ### Enclosing character
 
-Mostly, fields in a CSV file are just listed verbatim, but those which need to include the delimiter character (e.g. a comma) need to be enclosed by a pair of these characters (`"enclosureChar": "\""` for example [in the recipe](#hrecipe)), usually a double quote. Where an enclosed field also contains the enclosure character, it needs to be doubled. For example, with a conventional double quote we might have
+Mostly, column data in a CSV file is just listed verbatim, but columns which need to include the delimiter character (e.g. a comma) need to be enclosed by a pair of these characters (`"enclosureChar": "\""` for example [in the recipe](#hrecipe)), usually a double quote. This setting allows you to change that character - if the file uses a single quote for example.
+
+Where an enclosed field also contains the enclosure character, it needs to be doubled. For example, with a conventional double quote we might have
 
        ...,"This field has a "" symbol",...
 
@@ -388,6 +396,8 @@ When used from the [API](#huseapi), as a [library](#huselibrary), or in a [shell
         "outXMLElements": "true", # <x><k>v</k>...</x> rather than <x k="v" ...></x>
         "encoding": "UTF-8",
         "headerRows": 8,
+        "delimiterChar": ",",
+        "enclosureChar": "\"",
         "rowCount": 1, # default 1
         "ignoreRows": [ # one or more of these (row ignored if any is true):
             {"item": "column", "name": "A", "condition": "...", "value": "..."}, # conditions as before
