@@ -49,6 +49,12 @@ $(function(){
 		$("#ihelpframe").attr({src: $(this).attr("href")}).closest("#ihelp").css({top: $(window).scrollTop()+70, height: $(window).height()-100}).show();
 	});
 
+	var isubmissiontop = $("#isubmissioncontainer").offset().top;
+
+	$(window).scroll(function(e){
+		$("#isubmissioncontainer").toggleClass("ctoplocked", $(window).scrollTop()+10 > isubmissiontop);
+	})
+	
 	$("#ihelpclose").click(function(e){
 		/* close the help panel */
 		e.preventDefault(); e.stopPropagation();
@@ -159,7 +165,11 @@ $(function(){
 		/* rather than invoking the API, just save the options for re-use later */
 		var name = $("#irecipename").val();
 		if (name == "") { name = "(anonymous)"; }
-		$(this).attr({href: "data:application/json;charset=utf-8," + encodeURIComponent(makerecipe()),
+		var s = makerecipe();
+		if ($("#icopyrecipepretty").is(":checked")) {		
+			s = JSON.stringify(JSON.parse(s), null, 2);
+		}
+		$(this).attr({href: "data:application/json;charset=utf-8," + encodeURIComponent(s),
 					  download: name+".jcomma.json"});
 	});
 
@@ -198,7 +208,11 @@ $(function(){
 		if (name == "") { name = "(anonymous)"; }
 		localStorage.currentRecipe = name;
 		putlocalrecipejson(name, makerecipe());
-		$("#icopyrecipe").val(localStorage[recipestoragename(name)]);
+		var s = localStorage[recipestoragename(name)];
+		if ($("#icopyrecipepretty").is(":checked")) {
+			s = JSON.stringify(JSON.parse(s), null, 2);
+		}
+		$("#icopyrecipe").val(s);
 	}
 	
 	function loadrecipe(recipejson){
@@ -257,6 +271,11 @@ $(function(){
 		$(this).select();
 	});
 
+	$("#icopyrecipepretty").change(function(e){
+		saverecipe();
+	})
+
+	
 	function getcloudrecipejson(encodedurl){
 		$.ajax("/corsproxy.php?recipe="+encodedurl, {
 			dataType: "json",

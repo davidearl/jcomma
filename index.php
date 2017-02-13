@@ -34,7 +34,7 @@
   
   <hr>
 
-  <div>
+  <div id='isubmissioncontainer'>
 	<form id='isubmission' action='jcomma.php' class='csubmission' method='POST' target='_blank' enctype='multipart/form-data'>
 	  <label for='icsv'><strong>CSV File</strong>:</label> <a class='chelp cinfo' href='help.php?a=hcsv'></a>
 	  <input type='file' id='icsv' name='csv'>
@@ -81,7 +81,8 @@
 
 	  <div>
 		or copy recipe from here:<br>
-		<textarea id='icopyrecipe' readonly></textarea>
+		<textarea id='icopyrecipe' readonly></textarea><br>
+        <input id='icopyrecipepretty' type='checkbox'> pretty print recipe
 	  </div>
 	</div>
   </div>

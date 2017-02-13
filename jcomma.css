@@ -164,6 +164,19 @@ select {
     padding: 10px;
 }
 
+#isubmissioncontainer.ctoplocked {
+	position: fixed;
+	border-bottom: 1px solid #aaa;
+	width: calc(100% - 20px);
+	top: 0;
+	z-index: 10;
+}
+
+#isubmissioncontainer.ctoplocked #isubmission {
+	border-top: 10px solid white;
+	border-bottom: 10px solid white;
+}
+
 #icsv {
 	font-size: 120%;
 	margin: 5px;

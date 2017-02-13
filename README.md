@@ -101,7 +101,7 @@ As the browser saves all named recipes separately, there needs to be a way to cl
 
 All the settings described in the form are saved as a jcomma recipe, a JSON file, to a local file. Note that tghe whole recipe is saved on every change so if the page is reloaded, changes are not lost.
 
-Alternatively copy the JSON from the box provided to where you need it.
+Alternatively copy the JSON from the box provided to where you need it, optionally laid out prettily by checking "pretty print layout".
 
 As well as [restoring them](#hloadrecipe) to the page, a saved recipe can be used in automated workflows using jcomma, so that the recipes do not need to be hand written in JSON.
 
