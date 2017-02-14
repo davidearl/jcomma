@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <title>jcomma: a CSV converter</title>
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,700,700i" rel="stylesheet">
-<link rel='stylesheet' href='jcomma.css?v=32'>
+<link rel='stylesheet' href='jcomma.css?v=<?php echo filemtime('jcomma.css'); ?>'>
 <link rel='stylesheet' href='jquery-ui-1.12.1/jquery-ui.css'>
 <link rel='shortcut icon' href='logo.png'>
 <script src='jquery-3.1.0.min.js'></script>
 <script src='jquery-ui-1.12.1/jquery-ui.min.js'></script>
-<script src='jcomma.js'></script>
+<script src='jcomma.js?v=<?php echo filemtime('jcomma.js'); ?>'></script>
 </head>
 <body>
   <h1><img src='logo.svg' alt='logo'> jcomma: flexible conversion and sanitization of CSV and TSV files</h1>
