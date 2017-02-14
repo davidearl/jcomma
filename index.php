@@ -69,6 +69,11 @@
 	  </div>
 
 	  <div>
+        <span>or</span> <a href='#' id='iexample'>load an example recipe</a>
+        (and <a href='/Example.csv' download>download corresponding example CSV</a>)
+	  </div>
+
+	  <div>
 		<span>or</span> <a href='#' id='ideleterecipe'>delete recipe</a> from browser storage, and reset
 		<a class='chelp cinfo' href='help.php?a=hdeleterecipe'></a>
 	  </div>
@@ -417,6 +422,8 @@
 	  </div>
 	</li>
   </ul>
+
+  <div style='height: 200px;'></div>
 	
   <div id='ihelp'>
      <div id='ihelpcontrols'>

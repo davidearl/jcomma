@@ -107,6 +107,11 @@ $(function(){
 		loadrecipe(defaultrecipe);
 	});
 
+	$("#iexample").click(function(e){
+		e.preventDefault(); e.stopPropagation();
+		$.getJSON("/Example.jcomma.json", function(j){ $("#ipasterecipe").val(JSON.stringify(j)).change(); });
+	});
+
 	$("#ideleterecipe").click(function(e){
 		e.preventDefault(); e.stopPropagation();
 		var name = $("#irecipename").val();
@@ -257,6 +262,7 @@ $(function(){
 
 	$("#iloadrecipeurl").change(function(e){
 		var encodedurl = encodeURIComponent($(this).val());
+		if (encodedurl == "") { return; }
 		window.history.pushState({}, "", ".?recipe="+encodedurl);
 		getcloudrecipejson(encodedurl);
 	});

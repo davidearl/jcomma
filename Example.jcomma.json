@@ -1,0 +1,111 @@
+{
+  "recipeName": "Example",
+  "comment": "This recipe is provided as an example. The example CSV download link above gives you a (completely fictitious) CSV typical of one a bank might give you: try it with this recipe.\n\nThe recipe converts that and others like it into three columns: date (ISO), type and description concatenated, and amount (positive for deposits, negative for withdrawals).\n\nThings in the raw CSV that would often lead to problems include: the encoding (it is actually in Windows-1252 format), the pound signs and commas in amounts, the use of separate debit and credit columns, the heading rows, interspersed extra rows, and the custom date format.\n\nNote particularly the use of the amount field twice, one to manage deposits and one for withdrawals with one of them omitted for each row, the withdrawals being negated after conversion to number.\n",
+  "outputTo": "inline",
+  "outputFormat": "html",
+  "outputHeaderRow": "true",
+  "encoding": "auto",
+  "headerRows": 5,
+  "rowCount": 1,
+  "delimiterChar": ",",
+  "enclosureChar": "\"",
+  "ignoreRows": [
+    {
+      "item": "column",
+      "name": "Date",
+      "condition": "white"
+    },
+    {
+      "item": "column",
+      "name": "Date",
+      "condition": "nomatch",
+      "value": "/^[0-9]/"
+    }
+  ],
+  "records": [
+    {
+      "fields": [
+        {
+          "name": "date",
+          "comprising": [
+            {
+              "item": "column",
+              "column": "Date"
+            }
+          ],
+          "options": [
+            {
+              "item": "convertToDate",
+              "errorOnType": "true"
+            }
+          ]
+        },
+        {
+          "name": "details",
+          "comprising": [
+            {
+              "item": "column",
+              "column": "Transaction type"
+            },
+            {
+              "item": "text",
+              "text": " "
+            },
+            {
+              "item": "column",
+              "column": "Description"
+            }
+          ]
+        },
+        {
+          "name": "amount",
+          "comprising": [
+            {
+              "item": "column",
+              "column": "Paid out"
+            }
+          ],
+          "options": [
+            {
+              "item": "omitIf",
+              "test": "value",
+              "condition": "empty"
+            },
+            {
+              "item": "ignoreCurrency",
+              "currencies": "£$¥€,"
+            },
+            {
+              "item": "convertToNumber",
+              "negate": "true"
+            }
+          ]
+        },
+        {
+          "name": "amount",
+          "comprising": [
+            {
+              "item": "column",
+              "column": "Paid in"
+            }
+          ],
+          "options": [
+            {
+              "item": "omitIf",
+              "test": "value",
+              "condition": "empty"
+            },
+            {
+              "item": "ignoreCurrency",
+              "currencies": "£$¥€,"
+            },
+            {
+              "item": "convertToNumber"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "recipeVersion": 3
+}
