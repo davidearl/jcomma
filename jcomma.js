@@ -61,6 +61,12 @@ $(function(){
 		$("#ihelp").hide();
 	});
 
+	function highlightbadfields(){
+		$("#iform").find("select,.cfieldname,.crecordiffield,.cignorerowsname").each(function(idx,el){
+			$(this).toggleClass("cbadfield", $(this).val() == "");
+		});
+	}
+	
 	function toggleqif() {
 		/* qif format has some differences in the options, particularly the field names, which are fixed */
 		var qif = $("#ioutputformat").val() == "qif";
@@ -162,6 +168,12 @@ $(function(){
 			return;
 		}
 
+		highlightbadfields();
+		if ($(".cbadfield").length > 0) {
+			e.preventDefault();
+			alert("you have an empty entry (highlighted in red)");
+			return;
+		}
 		$("#isendrecipe").val(makerecipe());
 		// and continue to submit		
 	});
@@ -311,4 +323,5 @@ $(function(){
 		loadrecipe(getlocalrecipejson(localStorage.currentRecipe));
 	}
 	recipeselectoptions();
+
 });
