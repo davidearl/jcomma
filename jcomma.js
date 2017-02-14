@@ -324,4 +324,5 @@ $(function(){
 	}
 	recipeselectoptions();
 
+	setTimeout(highlightbadfields, 250);
 });
