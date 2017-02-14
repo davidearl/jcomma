@@ -377,13 +377,10 @@ class jcomma {
         foreach($this->recipe->ignoreRows as $ignoreRow) {
           if ($ignoreRow->item != 'column') { continue; }
           $nc = $this->columnnumber($ignoreRow->name);
-          if (isset($row[$nc])) {
-            if ($this->meetscondition($ignoreRow->condition,
-                                      isset($ignoreRow->value) ? $ignoreRow->value : '', $row[$nc]))
-            {
-              $i--; /* still get the same number of rows eventually even though we ignore this one */
-              continue 2;
-            }
+          $v = isset($row[$nc]) ? $row[$nc] : '';
+          if ($this->meetscondition($ignoreRow->condition, isset($ignoreRow->value) ? $ignoreRow->value : '', $v)) {
+            $i--; /* still get the same number of rows eventually even though we ignore this one */
+            continue 2;
           }
         }
       }
