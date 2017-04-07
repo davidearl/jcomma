@@ -1,5 +1,13 @@
 $(function(){
 
+	function ahem(t, s){
+		$('#imessage p').html($('#imessage p').text(s).html().replace(/\n/g, '<br>'));
+		$('#imessage').dialog({
+			width: 500
+		});
+		$(".ui-dialog-title").text(t);
+	}
+	
 	function sorting() {
 		$(".clevel1 .clist").sortable({handle: ".cmove2", cancel: "", stop: saverecipe});
 		$(".clevel2 .clist").sortable({handle: ".cmove3", cancel: "", stop: saverecipe});
@@ -121,8 +129,8 @@ $(function(){
 	$("#ideleterecipe").click(function(e){
 		e.preventDefault(); e.stopPropagation();
 		var name = $("#irecipename").val();
-		if (name == "") { alert("your recipe is anonymous"); return; }
-		if (! haslocalrecipe(name)) { alert("your recipe is not stored"); return; }
+		if (name == "") { ahem("Anon", "Your recipe is anonymous"); return; }
+		if (! haslocalrecipe(name)) { ahem("Not stored", "Your recipe is not stored"); return; }
 		delete localStorage[recipestoragename(name)];
 		loadrecipe(defaultrecipe);
 		recipeselectoptions();
@@ -160,18 +168,18 @@ $(function(){
 		   the file */
 		if ($("#icsv").val() == "" && $("#icsvpaste").val() == "") {
 			e.preventDefault();
-			alert("you need to choose a csv file to process");
+			ahem("No CSV", "You need to choose a csv file to process");
 			return;
 		} else if ($("#icsv").val() != "" && $("#icsvpaste").val() != "") {
 			e.preventDefault();
-			alert("choose either a csv file to process or paste one, but not both (to clear a previously chosen file, click Choose file, then Cancel)");
+			ahem("Both file and paste set", "choose either a csv file to process or paste one, but not both (to clear a previously chosen file, click Choose file, then Cancel)");
 			return;
 		}
 
 		highlightbadfields();
 		if ($(".cbadfield").length > 0) {
 			e.preventDefault();
-			alert("you have an empty entry (highlighted in red)");
+			ahem("Empty entry", "You have an empty entry (highlighted in red)");
 			return;
 		}
 		$("#isendrecipe").val(makerecipe());
@@ -235,8 +243,15 @@ $(function(){
 	function loadrecipe(recipejson){
 		/* given a recipe JSON string, set the form fields correspondingly */
 		$("#iform .cremove").each(function(idx,el) { $(el).closest(".cgroup").remove(); });
-		var recipe = JSON.parse(recipejson);
-		if (! recipe) { return; }
+		var recipe;
+		try {
+			recipe = JSON.parse(recipejson);
+			if (! recipe) { throw {message: "invalid JSON"}; }
+		} catch (e){
+			ahem("Bad JSON",
+				 "Incorrect JSON in recipe being loaded (note: you can check JSON for errors at http://jsonlint.com/). JSON says:\n\n"+e.message);
+			return;
+		}
 		if (! ("recipeName" in recipe)) { recipe.recipeName = "(anonymous)"; }
 		if (! ("delimiterChar" in recipe)) { recipe.delimiterChar = ','; }
 		if (! ("enclosureChar" in recipe)) { recipe.enclosureChar = '"'; }
@@ -302,7 +317,7 @@ $(function(){
 				loadrecipe(JSON.stringify(j));
 				saverecipe();
 			},
-			error: function(xhr, s, err){ alert("cannot fetch recipe from your given recipe URL"); }
+			error: function(xhr, s, err){ ahem("Bad URL", "cannot fetch recipe from your given recipe URL"); }
 		});		
 	}
 	

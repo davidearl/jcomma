@@ -282,3 +282,13 @@ a {
 .cbadfield {
 	background-color: #f7b9ad;
 }
+
+.ui-widget-header {
+    background-color: #f17171 !important;
+}
+.ui-dialog .ui-dialog-title {
+	color: white;
+}
+.ui-widget.ui-widget-content {
+	box-shadow: 5px 5px 5px 0px rgba(140,140,140,1);
+}
