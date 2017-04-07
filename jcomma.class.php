@@ -27,18 +27,20 @@ class jcomma {
   }
 
   function columnnumber($l) {
-    $l = strtoupper($l);
-    if (isset($this->headings[$l])) { $l = $this->headings[$l]; /* convert to column letter */ }
-    if (strlen($l) == 0) { self::oops('invalid column letter'); }
-    if (strlen($l) == 1) {
-      $n = strpos(self::$alphabet, $l);
-      if ($n === FALSE) { self::oops('invalid column letter: '.$l); }
+    $ll = strtoupper($l);
+    if (isset($this->headings[$ll])) { $ll = $this->headings[$ll]; /* convert to column letter */ }
+    if (strlen($ll) == 0) { self::oops("invalid column identifier: {$l}"); }
+    if (strlen($ll) == 1) {
+      $n = strpos(self::$alphabet, $ll);
+      if ($n === FALSE) { self::oops("invalid column identifier: {$l}"); }
       return $n;
     }
-    $n1 = strpos(self::$alphabet, $l[0]);
-    $n2 = strpos(self::$alphabet, $l[1]);
-    if ($n1 === FALSE || $n2 == FALSE) { self::oops('invalid column letter: '.$l); }
-    return $n1 * 26 + $n2;
+    if (strlen($ll) != 2) { self::oops("invalid column identifier: {$l}"); }
+    $n1 = strpos(self::$alphabet, $ll[0]);
+    $n2 = strpos(self::$alphabet, $ll[1]);
+    if ($n1 === FALSE || $n2 === FALSE) { self::oops("invalid column identifier: {$l}"); }
+    $n = ($n1+1) * 26 + $n2;
+    return $n;
   }
 
   function describefield($field, $text=NULL, $value=NULL){
