@@ -21,7 +21,7 @@ class jcomma {
 
   function columnletter($n) {
     if ($n < 26) { return self::$alphabet[$n]; }
-    $l1 = (int)($n/26);
+    $l1 = (int)($n/26)-1;
     $l2 = $n % 26;
     return self::$alphabet[$l1].self::$alphabet[$l2];
   }
