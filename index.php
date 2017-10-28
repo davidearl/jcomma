@@ -416,8 +416,17 @@
 		  <input type='text' class='cinput cinput4' name='field' value='' placeholder='field name'>
 		</span>
 		<span class='cinitiallyhidden cfurtheroption cfieldappend'>
-		  <input type='checkbox' class='cinput cinput4' name='appendComma' value='true'> append comma
-		  <input type='checkbox' class='cinput cinput4' name='appendSpace' value='true'> append space
+		  <span style='white-space: nowrap;'>
+            <input type='checkbox' class='cinput cinput4' name='trimSpaces' value='true'> trim
+          </span>
+		  <span style='white-space: nowrap;'>
+            <input type='checkbox' class='cinput cinput4' name='prefixMinus' value='true'> prefix minus
+          </span>
+		  <span style='white-space: nowrap;'>
+		    <input type='checkbox' class='cinput cinput4' name='appendComma' value='true'> append comma
+		  <span style='white-space: nowrap;'>
+		    <input type='checkbox' class='cinput cinput4' name='appendSpace' value='true'> append space
+          </span>
 		</span>
 	  </div>
 	</li>

@@ -286,7 +286,7 @@ In this way multiple columns of a spreadsheet can be distributed as array elemen
 
 In table formats (HTML, CSV, XLSX), the values just appear as consecutive columns headed (when requested) by the dotted/indexed name. Column headings are worked out from the field names of the first record.
 
-You can usefully have more than one field with the same name (usually consecutive), providing you set options to omit each in opposite circumstances. For example, say you have debit and credit columns in the original CSV but require a single simple number, positive for credit and negative for debit. So you would make one field from credit and the same field from debit, each of which has the option to omit if blank, and convert to a number, while debit also includes the option to negate when converting to a number.
+You can usefully have more than one field with the same name (usually consecutive), providing you set options to omit each in opposite circumstances. For example, say you have debit and credit columns in the original CSV but require a single simple number, positive for credit and negative for debit. So you could make one field from credit and the same field from debit, each of which has the option to omit if zero, and convert to a number, while the debit version of the field also includes the option to negate when converting to a number. (However, if the opposite column is actually always blank rather than zero - the more common case - it would be easier to create a single field comprising both columns and setting the option to prefix the debit column with a minus sign in the concatenation).
 
 ### don't include in output
 
@@ -303,7 +303,14 @@ You can also include verbatim text, for example to parenthesis a second column. 
 
 You can also include another field as a source for this field. However, it must be a field defined earlier in the record: fields are computed in order, so later fields are not available at this point. (`"comprising": [{"item": "field", "field": "name", ...}, ...]` [in the recipe](#hrecipe)).
 
-For fields and columns, check boxes are available to append comma (`"appendComma": true` [in the recipe](#hrecipe)), space (`"appendSpace": true` [in the recipe](#hrecipe)) or both. This is jsut a shortcut for including these as verbatim text.
+For fields and columns, check boxes are available to:
+
+* trim any leading or trailing white space (spaces, newlines, tabs) from the column before including it (`"trimSpaces": true` [in the recipe](#hrecipe)),
+* prefix a minus sign, when input not empty (after any trimming) (`"prefixMinus": true` [in the recipe](#hrecipe)).  Prefixing a minus sign to one of a pair of concatenated columns provides one way to convert separate credit and debit columns, when one or the other is always blank, to a single positive/negative column (currency symbols can be removed later using output options if necessary).
+* append a comma, when input not empty (after any trimming) (`"appendComma": true` [in the recipe](#hrecipe)), thereby forming a comma separated list from the input columns, and
+* append a space, when input not empty (after any trimming) (`"appendSpace": true` [in the recipe](#hrecipe))
+
+in any combination. This is just a shortcut for including these as verbatim text.
 
 Click + to include a new column, field or text, X to remove one, and drag &#x2195; to change the order
 
@@ -412,16 +419,20 @@ When used from the [API](#huseapi), as a [library](#huselibrary), or in a [shell
                             {"item": "column",
                              "column": "A",
                              "rowOffset": 0, # optional, N=0 by default, otherwise from row relative to current from the N specified for the record in rowCount
+                             "trimSpaces": true, # applied first if set
+                             "prefixMinus": true,
                              "appendComma": true,
-                             "appendSpace": true # comma first if both set
+                             "appendSpace": true # comma first if appendComma also set
                             },
                             {"item": "text",
                              "text": "whatever"
                             },
                             {"item": "field",
                              "field": "name",
+                             "trimSpaces": true, # applied first if set
+                             "prefixMinus": true,
                              "appendComma": true,
-                             "appendSpace": true # comma first if both set
+                             "appendSpace": true # comma first if appendComma also set
                             },
                             ...
                         ],

@@ -1,6 +1,6 @@
 <?php
 
-define ("CURRENT_VERSION", 3);
+define ("CURRENT_VERSION", 4);
 
 class jcomma {
 
@@ -470,19 +470,24 @@ class jcomma {
             case 'column':
               $rowOffset = isset($comprising->rowOffset) ? $comprising->rowOffset : 0;
               if (isset($rows[$rowOffset][$this->columnnumber($comprising->column)])) {
-                $outputvalue .= $rows[$rowOffset][$this->columnnumber($comprising->column)];
+                $inputvalue = $rows[$rowOffset][$this->columnnumber($comprising->column)];
               }
               break;
             case 'text':
-              $outputvalue .= $comprising->text;
+              $inputvalue = $comprising->text;
               break;
             case 'field':
               if (! isset($outputrecord->{$comprising->field})) { $this->oops("at row {$this->currentrow}, {$comprising->field} is not a previous field in the same record"); }
-              $outputvalue .= $outputrecord->{$comprising->field};
+              $inputvalue = $outputrecord->{$comprising->field};
               break;
             }
-            if (! empty($comprising->appendComma)) { $outputvalue .= ','; }
-            if (! empty($comprising->appendSpace)) { $outputvalue .= ' '; }
+            if (! empty($comprising->trimSpaces)) { $inputvalue = trim($inputvalue); }
+            if (! empty($inputvalue)) {
+              if (! empty($comprising->prefixMinus)) { $inputvalue = '-'.$inputvalue; }
+              if (! empty($comprising->appendComma)) { $inputvalue .= ','; }
+              if (! empty($comprising->appendSpace)) { $inputvalue .= ' '; }
+            }
+            $outputvalue .= $inputvalue;            
           }
 
           /* apply options */
