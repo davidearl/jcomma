@@ -143,6 +143,24 @@ $(function(){
 	$("#idelimiter").change(function(e){
 		$("#idelimitertab").prop({checked: $(this).val() == "\t"});
 	});
+
+	$("#iform").on("focus", ".cinput[type=text]", function(){
+		$(this).css({width: $(this).width()*5});
+	}).on("blur", ".cinput[type=text]", function(){
+		setinputwidth($(this));
+	});
+
+	function setinputwidth(j){
+		var jtest = $('<div style="display: inline-block; position: absolute; left: 10000;">').
+			text(j.val()).appendTo('body');
+		var w = jtest.width();
+		jtest.remove();
+		j.css({width: w});		
+	}
+
+	function setinputwidths(){
+		$(".cinput[type=text]").each(function(idx,el){ setinputwidth($(el)); });
+	}
 	
 	function recurse(level, jel){
 		/* use the DOM structure to create a corresponding JSON object to send to the API */
@@ -256,6 +274,7 @@ $(function(){
 		if (! ("delimiterChar" in recipe)) { recipe.delimiterChar = ','; }
 		if (! ("enclosureChar" in recipe)) { recipe.enclosureChar = '"'; }
 		$.each(recipe, function(k, v){ populate(k, v, $("#iform")); });
+		setinputwidths();
 		$("#idelimitertab").prop({checked: $("#idelimiter").val() == "\t"});
 		toggleqif();
 		sorting();

@@ -62,7 +62,12 @@ body {
 }
 
 .cfurtheroptions {
-	display: inline-block;
+	display: inline-block;	
+}
+.cinput[type=text] {
+	width: 120px;
+	min-width: 120px;
+	max-width: 600px;
 }
 
 .cadd, .cremove, .cmove {
@@ -108,9 +113,9 @@ input[type=text] {
 	border: 1px solid #888;
 }
 
-.cshortinput {
-	width: 30px;
-	text-align: right;
+.cinput.cshortinput {
+	min-width: 30px;
+	text-align: center;
 }
 
 .ccontrolchar {
