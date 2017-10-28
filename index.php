@@ -145,20 +145,9 @@
 	      <label for='ioutputcsvheaderrow'>include header row</label>
 	  </span>
 	  
-	  <span class='coutputformatxlsx cinitiallyhidden cfurtheroption'>
-		<input type='checkbox' id='ioutputxlsxheaderrow' class='cinput cinput1' name='outputHeaderRow' value='true'>
-	      <label for='ioutputxlsxheaderrow'>include header row</label>
-	  </span>
-	  
-	  <span class='coutputformathtml cinitiallyhidden cfurtheroption'>
-		<input type='checkbox' id='ioutputhtmlxheaderrow' class='cinput cinput1' name='outputHeaderRow' value='true'>
-	      <label for='ioutputhtmlheaderrow'>include header row</label>
-	  </span>
-	  
-	  <span class='coutputformatxml cinitiallyhidden cfurtheroption' >
-		<input type='checkbox' id='ioutputxmlelements' class='cinput cinput1' name='outputXMLElements' value='true'>
-	      <label for='ioutputxmlelements'>values as elements rather than attributes</label>
-		<input type='text' id='ioutputxmlname' class='cinput cinput1' name='outputName' placeholder='element name (optional)'>
+	  <span class='coutputformatxlsx coutputformathtml coutputformatxml cinitiallyhidden cfurtheroption'>
+		<input type='checkbox' id='ioutputheaderrow' class='cinput cinput1' name='outputHeaderRow' value='true'>
+	      <label for='ioutputheaderrow'>include header row</label>
 	  </span>
 	  
 	  <span class='coutputformatqif cinitiallyhidden cfurtheroption' >

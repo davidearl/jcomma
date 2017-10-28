@@ -241,7 +241,7 @@ $(function(){
 	function makerecipe(){
 		/* capture the form content and return as a JSON string (we may save this to a file or localStorage) */
 		var data = recurse(1, $("#iform .coptions"));
-		data.recipeVersion = 3;
+		data.recipeVersion = 4;
 		return JSON.stringify(data);
 	}
 
@@ -261,6 +261,7 @@ $(function(){
 	function loadrecipe(recipejson){
 		/* given a recipe JSON string, set the form fields correspondingly */
 		$("#iform .cremove").each(function(idx,el) { $(el).closest(".cgroup").remove(); });
+		$("#iform input[type=checkbox]").prop({checked: false});
 		var recipe;
 		try {
 			recipe = JSON.parse(recipejson);
@@ -279,6 +280,7 @@ $(function(){
 		toggleqif();
 		sorting();
 		$("#icopyrecipe").val(recipejson);
+		$("#icopyrecipepretty").prop({checked: recipejson.charAt(1) != '"'});
 		localStorage.currentRecipe = recipe.recipeName;
 		$("#iyourrecipe").fadeOut(100, function(){ $(this).fadeIn(400); });
 	}
