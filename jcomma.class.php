@@ -573,7 +573,13 @@ class jcomma {
               break;
             case 'convertToDate':
             case 'convertToCustomDate':
-              $date = empty($option->dateFormatUS) ? str_replace('/', '-', $outputvalue) : $outputvalue;
+              if (empty($option->dateFormatUS) && (strpos($outputvalue, '/') || strpos($outputvalue, '.')) !== FALSE) {
+                $date = str_replace(['/','.'], '-', $outputvalue);
+                $century = substr(date('Y'), 0, 2);
+                $date = preg_replace('~^([0-9]+)-([0-9]+)-([0-9]{2})($|[^0-9])~', "$1-$2-{$century}$3$4", $date);
+              } else {
+                $date = $outputvalue;
+              }
               $time = strtotime($date);
               if ($time === FALSE) {
                 if (! empty($option->errorOnType)) {
