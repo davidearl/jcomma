@@ -70,7 +70,7 @@ $(function(){
 	});
 
 	function highlightbadfields(){
-		$("#iform").find("select,.cfieldname,.crecordiffield,.cignorerowsname").each(function(idx,el){
+		$("#iform").find("select,.cfieldname,.crecordiffield,.cignorerowsname,.ccombinerowsname").each(function(idx,el){
 			$(this).toggleClass("cbadfield", $(this).val() == "");
 		});
 	}
@@ -241,7 +241,7 @@ $(function(){
 	function makerecipe(){
 		/* capture the form content and return as a JSON string (we may save this to a file or localStorage) */
 		var data = recurse(1, $("#iform .coptions"));
-		data.recipeVersion = 4;
+		data.recipeVersion = 5;
 		return JSON.stringify(data);
 	}
 

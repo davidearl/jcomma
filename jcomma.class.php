@@ -1,6 +1,6 @@
 <?php
 
-define ("CURRENT_VERSION", 4);
+define ("CURRENT_VERSION", 5);
 
 class jcomma {
 
@@ -204,6 +204,12 @@ class jcomma {
       $this->checkcondition(['ignoreRows', $i, 'condition']);
     }
 
+    $this->checkarray(['combineRows'], []);
+    for($i = 0; $i < count($this->recipe->combineRows); $i++) {
+      $this->checkstring(['combineRows', $i, 'name']);
+      $this->checkcondition(['combineRows', $i, 'condition']);
+    }
+
     $records = $this->checkarray(['records'], []);
     if (count($records) == 0) {
       $this->errors[] = 'records array is empty - nothing would be produced';
@@ -375,6 +381,27 @@ class jcomma {
       $this->currentrow++;
       if ($row === FALSE) { return FALSE; }
       if (! $exact) {
+        /* see if we should combine next row per condition specified: this requires looking ahead */
+        if (! empty($this->recipe->combineRows)) {
+          for(;;) {
+            $fp = ftell($this->fd); /* for when we don't combine */
+            $nextRow = fgetcsv($this->fd, NULL,
+                               $this->recipe->delimiterChar, $this->recipe->enclosureChar);
+            if ($nextRow === FALSE) { break; }
+            foreach($this->recipe->combineRows as $combineRow) {
+              $nc = $this->columnnumber($combineRow->name);
+              $v = isset($nextRow[$nc]) ? $nextRow[$nc] : '';
+              if ($this->meetscondition($combineRow->condition, isset($combineRow->value) ? $combineRow->value : '', $v)) {
+                $rows[] = $this->asutf8($row);
+                $row = $nextRow;
+                continue 2; /* to try another combine */
+              }
+            }
+            break;
+          }
+          fseek($this->fd, $fp);
+        }
+
         /* see if we should ignore this row per condition specified */
         foreach($this->recipe->ignoreRows as $ignoreRow) {
           if ($ignoreRow->item != 'column') { continue; }

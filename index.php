@@ -202,6 +202,12 @@
 	  <button id='iaddignorerows' class='cadd' proforma='iignorerowsproforma'>+</button> <span class='canother'>another ignore row condition</span>
 	</div>
 
+	<div class='csection coptions clevel1'>
+	  <label class='clabelheader'>Combine rows with previous in CSV in any of these cases:</label> (except in header rows) <a class='chelp cinfo' href='help.php?a=hcombinerows'></a><br>
+	  <ul class='clist'></ul>
+	  <button id='iaddcombinerows' class='cadd' proforma='icombinerowsproforma'>+</button> <span class='canother'>another combine row condition</span>
+	</div>
+
   	<div class='csection coptions clevel1'>
 	  <label class='clabelheader'>Output records</label>
 	    <a class='chelp cinfo' href='help.php?a=hrecords'></a>
@@ -215,10 +221,11 @@
 	<li class='cproforma cgroup clevel2 cignorerows' id='iignorerowsproforma' name='ignoreRows'>
 	  <button class='cmove cmove2'>&#x2195;</button>
 	  <button class='cremove'>&#x274c;</button>
-	  <div class='cgroup'>	
+	  <div class='cgroup'>
+		If
 		<select class='cignorerowstype cinput cinput2' name='item'>
-		  <option value='column'>If column...</option>
-		  <option value='field'>If field...</option>
+		  <option value='column'>column...</option>
+		  <option value='field'>field...</option>
 		</select>
 		<input type='text' class='cignorerowsname cinput cinput2' name='name' placeholder='column letter/header or field name'>
 		<div class='coptionset cfurtheroptions'>
@@ -235,6 +242,31 @@
             <option value='after' furtheroptions='cignorerowsvalue'>after (date):</option>
 		  </select>
 		  <input type='text' class='cignorerowsvalue cinitiallyhidden cfurtheroption cinput cinput2' name='value' placeholder='value to compare with'>
+		  <a class='chelp cinfo' href='help.php?a=hconditions'></a>
+		</div>
+	  </div>
+	</li>
+
+	<li class='cproforma cgroup clevel2 ccombinerows' id='icombinerowsproforma' name='combineRows'>
+	  <button class='cmove cmove2'>&#x2195;</button>
+	  <button class='cremove'>&#x274c;</button>
+	  <div class='cgroup'>
+		Column
+		<input type='text' class='ccombinerowsname cinput cinput2' name='name' placeholder='column letter/header'>
+		<div class='coptionset cfurtheroptions'>
+		  <select class='ccombinerowscondition cinput cinput2' name='condition'>
+			<option value='empty' selected='selected' furtheroptions=''>empty (no text at all)</option>
+			<option value='white' furtheroptions=''>whitespace only or empty</option>
+			<option value='match' furtheroptions='ccombinerowsvalue'>matches regular expression</option>
+			<option value='nomatch' furtheroptions='ccombinerowsvalue'>does not match regular expression</option>
+			<option value='eq' furtheroptions='ccombinerowsvalue'>equal to</option>
+			<option value='ne' furtheroptions='ccombinerowsvalue'>not equal to</option>
+            <option value='ge' furtheroptions='ccombinerowsvalue'>greater or equal to:</option>
+            <option value='le' furtheroptions='ccombinerowsvalue'>less or equal to:</option>
+            <option value='before' furtheroptions='ccombinerowsvalue'>before (date):</option>
+            <option value='after' furtheroptions='ccombinerowsvalue'>after (date):</option>
+		  </select>
+		  <input type='text' class='ccombinerowsvalue cinitiallyhidden cfurtheroption cinput cinput2' name='value' placeholder='value to compare with'>
 		  <a class='chelp cinfo' href='help.php?a=hconditions'></a>
 		</div>
 	  </div>

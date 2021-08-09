@@ -219,6 +219,19 @@ See [conditions](#hconditions) for details about the conditions (the same set of
 
 Note that rows are not ignored in this way when extracting any header row(s) (where exactly the number given are consumed from the CSV).
 
+(#hconcatrows)
+### Combine rows...
+
+While you can read more than one row for all the content, sometimes the CSV will pop in ano extra unexpected row. You can combine rows selectively based on some condition (e.g. first column is empty).
+
+This setting (`"combineRows": [ ... ]` [in the recipe](#hrecipe)) lets you include such rows together based on one or more criteria. Add a new criterion by pressing the + button, remove an existing one with X, and drag &#x2195; to change the order. The row is combined with the previous if any one of the criteria is satisfied.
+
+See [conditions](#hconditions) for details about the conditions (the same set of conditions is used in several different places).
+
+Note that rows are not combined in this way when extracting any header row(s) (where exactly the number given are consumed from the CSV).
+
+Note also that rows will continue to be combined until some row does not meet the condition, and that if each record is normally formed from more than one row, that will continue to apply to the following uncombined rows following.
+
 (#hrecords)
 ## Output records
 
