@@ -12,7 +12,7 @@ class jcomma {
     }
     $this->recipe = $recipe;
     $this->currentrow = 0;
-    $this->errors = array();
+    $this->errors = [];
   }
 
   static $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -114,7 +114,7 @@ class jcomma {
   }
 
   function checkcondition($field) {
-    $conditions = array('empty', 'white', 'match', 'nomatch', 'eq', 'ne', 'ge', 'le', 'before', 'after');
+    $conditions = ['empty', 'white', 'match', 'nomatch', 'eq', 'ne', 'ge', 'le', 'before', 'after'];
     $condition = $this->checkstring($field, $conditions);
     array_pop($field);
     $field[] = 'value';
@@ -148,11 +148,11 @@ class jcomma {
       if (gettype($f) == 'integer') {
         if (! is_array($o)) {
           $this->errors[] = $this->describefield($field, '- array expected');
-          $o = array();
+          $o = [];
         }
         if (! isset($o[$f])) {
           if (is_null($default)) { $this->describefield($field, 'is missing'); return NULL; }
-          $o[$f] = $last ? $default : (gettype($field[$i+1] == 'integer') ? array() : new stdClass());
+          $o[$f] = $last ? $default : (gettype($field[$i+1] == 'integer') ? [] : new stdClass());
         }
         $o = $o[$f];
       } else {
@@ -162,7 +162,7 @@ class jcomma {
         }
         if (! isset($o->$f)) {
           if (is_null($default)) { $this->errors[] = $this->describefield($field, 'is missing'); }
-          $o->$f = $last ? $default : (gettype($field[$i+1] == 'integer') ? array() : new stdClass());
+          $o->$f = $last ? $default : (gettype($field[$i+1] == 'integer') ? [] : new stdClass());
         }
         $o = $o->$f;
       }
@@ -171,110 +171,110 @@ class jcomma {
   }
   
   function validate(){
-    $this->checkint(array('recipeVersion'), 1, 1);
+    $this->checkint(['recipeVersion'], 1, 1);
     if ($this->recipe->recipeVersion > CURRENT_VERSION) {
       $this->oops("The server version ".CURRENT_VERSION." predates the recipe version ({$this->recipe->recipeVersion}) supplied");
     }
-    $this->checkstring(array('outputFormat'),
-                       array('json','csv', 'html', 'xlsx', 'xml', 'qif'),
+    $this->checkstring(['outputFormat'],
+                       ['json','csv', 'html', 'xlsx', 'xml', 'qif'],
                        FALSE, 'jsonarray');
-    $this->checkstring(array('outputTo'),
-                       array('inline','attachment', 'string'),
+    $this->checkstring(['outputTo'],
+                       ['inline','attachment', 'string'],
                        FALSE, 'attachment');
     
-    $this->checkint(array('headerRows'), 0, 0);
-    $this->checkint(array('rowCount'), 1, 1);
-    $this->checkstring(array('encoding'), NULL, FALSE, 'auto');
+    $this->checkint(['headerRows'], 0, 0);
+    $this->checkint(['rowCount'], 1, 1);
+    $this->checkstring(['encoding'], NULL, FALSE, 'auto');
 
-    $v = $this->checkstring(array('delimiterChar'), NULL, TRUE, ',');
+    $v = $this->checkstring(['delimiterChar'], NULL, TRUE, ',');
     if (strlen($v) > 1) {
-      $this->errors[] = $this->describefield(array('delimiterChar'),
+      $this->errors[] = $this->describefield(['delimiterChar'],
                                              ' is too long (only 1 character allowed)');
     }
-    $v = $this->checkstring(array('enclosureChar'), NULL, TRUE, '"');
+    $v = $this->checkstring(['enclosureChar'], NULL, TRUE, '"');
     if (strlen($v) > 1) {
-      $this->errors[] = $this->describefield(array('enclosureChar'),
+      $this->errors[] = $this->describefield(['enclosureChar'],
                                              ' is too long (only 1 character allowed)');
     }
     
-    $this->checkarray(array('ignoreRows'), array());
+    $this->checkarray(['ignoreRows'], []);
     for($i = 0; $i < count($this->recipe->ignoreRows); $i++) {
-      $this->checkstring(array('ignoreRows', $i, 'item'), array('column', 'field'));
-      $this->checkstring(array('ignoreRows', $i, 'name'));
-      $this->checkcondition(array('ignoreRows', $i, 'condition'));
+      $this->checkstring(['ignoreRows', $i, 'item'], ['column', 'field']);
+      $this->checkstring(['ignoreRows', $i, 'name']);
+      $this->checkcondition(['ignoreRows', $i, 'condition']);
     }
 
-    $records = $this->checkarray(array('records'), array());
+    $records = $this->checkarray(['records'], []);
     if (count($records) == 0) {
       $this->errors[] = 'records array is empty - nothing would be produced';
     }
 
     for($ir = 0; $ir < count($this->recipe->records); $ir++) {
-      $unless = $this->checkarray(array('records', $ir, 'unless'), array());
+      $unless = $this->checkarray(['records', $ir, 'unless'], []);
       for ($iu = 0; $iu < count($unless); $iu++) {
-        $this->checkstring(array('records', $ir, 'unless', $iu, 'field'));
-        $this->checkcondition(array('records', $ir, 'unless', $iu, 'condition'));
+        $this->checkstring(['records', $ir, 'unless', $iu, 'field']);
+        $this->checkcondition(['records', $ir, 'unless', $iu, 'condition']);
       }
       
-      $fields = $this->checkarray(array('records', $ir, 'fields'), array());
+      $fields = $this->checkarray(['records', $ir, 'fields'], []);
       for ($if = 0; $if < count($fields); $if++) {
-        $this->checkstring(array('records', $ir, 'fields', $if, 'name'));        
-        $options = $this->checkarray(array('records', $ir, 'fields', $if, 'options'), array());
+        $this->checkstring(['records', $ir, 'fields', $if, 'name']);        
+        $options = $this->checkarray(['records', $ir, 'fields', $if, 'options'], []);
         for($io = 0; $io < count($options); $io++) {
-          $test = $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'test'),
-                                     array('value','field','column'), TRUE, 'value');
+          $test = $this->checkstring(['records', $ir, 'fields', $if, 'options', $io, 'test'],
+                                     ['value','field','column'], TRUE, 'value');
           switch ($test) {
           case 'field':
-            $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'field'));
+            $this->checkstring(['records', $ir, 'fields', $if, 'options', $io, 'field']);
             break;
           case 'column':
-            $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'column'));
+            $this->checkstring(['records', $ir, 'fields', $if, 'options', $io, 'column']);
             break;
           }
 
-          $item = $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'item'),
-                                     array('ignoreCurrency','replaceRegExp','replaceString','trim',
-                                           'bookkeepersNegative','skipIf','skipUnless','omitIf',
-                                           'convertToNumber','convertToDate', 'convertToCustomDate',
-                                           'errorOnValue'));
+          $item = $this->checkstring(['records', $ir, 'fields', $if, 'options', $io, 'item'],
+                                     ['ignoreCurrency','replaceRegExp','replaceString','trim',
+                                      'bookkeepersNegative','skipIf','skipUnless','omitIf',
+                                      'convertToNumber','convertToDate', 'convertToCustomDate',
+                                      'errorOnValue']);
           switch($item) {
           case 'ignoreCurrency':
-            $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'currencies'));
+            $this->checkstring(['records', $ir, 'fields', $if, 'options', $io, 'currencies']);
             break;
           case 'replaceRegExp':
           case 'replaceString':
-            $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'matches'));
-            $this->checkstring(array('records', $ir, 'fields', $if, 'options', $io, 'value'), NULL, TRUE, '');
+            $this->checkstring(['records', $ir, 'fields', $if, 'options', $io, 'matches']);
+            $this->checkstring(['records', $ir, 'fields', $if, 'options', $io, 'value'], NULL, TRUE, '');
             break;
           case 'skipIf':
           case 'skipUnless':
           case 'omitIf':
-            $this->checkcondition(array('records', $ir, 'fields', $if, 'options', $io, 'condition'));
+            $this->checkcondition(['records', $ir, 'fields', $if, 'options', $io, 'condition']);
             break;
           case 'errorOnValue':
-            $this->checkcondition(array('records', $ir, 'fields', $if, 'options', $io, 'condition'));
+            $this->checkcondition(['records', $ir, 'fields', $if, 'options', $io, 'condition']);
             break;
           }
           
         }
         
-        $comprising = $this->checkarray(array('records', $ir, 'fields', $if, 'comprising'), array());
+        $comprising = $this->checkarray(['records', $ir, 'fields', $if, 'comprising'], []);
         if (count($comprising) == 0) {
-          $this->errors[] = $this->describefield(array('records', $ir, 'fields', $if, 'comprising'), 'is empty, nothing to do for this field');
+          $this->errors[] = $this->describefield(['records', $ir, 'fields', $if, 'comprising'], 'is empty, nothing to do for this field');
         }
         for ($ic = 0; $ic < count($comprising); $ic++) {
-          $item = $this->checkstring(array('records', $ir, 'fields', $if, 'comprising', $ic, 'item'),
-                                     array('column', 'text', 'field'));
+          $item = $this->checkstring(['records', $ir, 'fields', $if, 'comprising', $ic, 'item'],
+                                     ['column', 'text', 'field']);
           switch($item){
           case 'column':
-            $this->checkstring(array('records', $ir, 'fields', $if, 'comprising', $ic, 'column'));
-            $this->checkint(array('records', $ir, 'fields', $if, 'comprising', $ic, 'rowOffset'), 0, 0);
+            $this->checkstring(['records', $ir, 'fields', $if, 'comprising', $ic, 'column']);
+            $this->checkint(['records', $ir, 'fields', $if, 'comprising', $ic, 'rowOffset'], 0, 0);
             break;
           case 'text':
-            $this->checkstring(array('records', $ir, 'fields', $if, 'comprising', $ic, 'text'));          
+            $this->checkstring(['records', $ir, 'fields', $if, 'comprising', $ic, 'text']); 
             break;
           case 'field':
-            $this->checkstring(array('records', $ir, 'fields', $if, 'comprising', $ic, 'field'));          
+            $this->checkstring(['records', $ir, 'fields', $if, 'comprising', $ic, 'field']); 
             break;
           }          
         }        
@@ -351,11 +351,11 @@ class jcomma {
           }
         }
         if ($topbitset) {
-          $encoding = mb_detect_encoding($s, array('UTF-8', 'ASCII', 
+          $encoding = mb_detect_encoding($s, ['UTF-8', 'ASCII', 
             'ISO-8859-1', 'ISO-8859-2', 'ISO-8859-3', 'ISO-8859-4', 'ISO-8859-5', 
             'ISO-8859-6', 'ISO-8859-7', 'ISO-8859-8', 'ISO-8859-9', 'ISO-8859-10', 
             'ISO-8859-13', 'ISO-8859-14', 'ISO-8859-15', 'ISO-8859-16', 
-            'Windows-1251', 'Windows-1252', 'Windows-1254'));
+            'Windows-1251', 'Windows-1252', 'Windows-1254']);
           if (empty($encoding)) { self::oops("unable to detect CSV's encoding - choose one explicitly"); }
           if ($encoding != 'UTF-8' && $encoding != 'ASCII') { $this->encoding = $encoding; }
         }
@@ -367,9 +367,9 @@ class jcomma {
     return $row;
   }
   
-  function readrows($n, $exact=FALSE){
-    $rows = array();
-    for($i = 0; $i < $n; $i++) {
+  function readrows($rowCount, $exact=FALSE){
+    $rows = [];
+    for($i = 0; $i < $rowCount; $i++) {
       $row = fgetcsv($this->fd, NULL,
                      $this->recipe->delimiterChar, $this->recipe->enclosureChar);
       $this->currentrow++;
@@ -446,7 +446,7 @@ class jcomma {
       }
     }
 
-    $output = array();
+    $output = [];
     
     for(;;) {
       $rows = $this->readrows($this->recipe->rowCount);
@@ -456,7 +456,7 @@ class jcomma {
       foreach($this->recipe->records as $record) {
 
         $outputrecord = new stdClass();
-        $excludefields = array();
+        $excludefields = [];
         
         foreach ($record->fields as $field) {
 
@@ -633,13 +633,13 @@ class jcomma {
   /* now the output functions... */
   
   function output($output, $inputfilename, $cl=FALSE){
-    $mimetypes = array('json'=>'application/json',
-                       'csv'=>'application/csv',
-                       'html'=>'text/html',
-                       'xlsx'=>'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                       'xml'=>'text/xml',
-                       'qif'=>'text/plain',
-    );
+    $mimetypes = ['json'=>'application/json',
+                  'csv'=>'application/csv',
+                  'html'=>'text/html',
+                  'xlsx'=>'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                  'xml'=>'text/xml',
+                  'qif'=>'text/plain',
+    ];
     $this->cl = $cl;
     $this->elementname = empty($this->recipe->outputName) ?
                        preg_replace('~[^a-z0-9_]~i', '', str_replace('.csv','',$inputfilename)) :
@@ -675,7 +675,7 @@ class jcomma {
     } else {
       $s = '';
       foreach($output as $record) {
-        $s .= json_encode(array('create'=>array('_type'=>$this->elementname)))."\n".json_encode($record)."\n";
+        $s .= json_encode(['create'=>['_type'=>$this->elementname]])."\n".json_encode($record)."\n";
       }
     }
     return $s;
@@ -693,7 +693,7 @@ class jcomma {
   
   function outputcsv($output) {
     $encoding = empty($this->recipe->outputEncoding) ? NULL : $this->recipe->outputEncoding;
-    $s = ! empty($this->recipe->outputHeaderRow) ? $this->csv_keys($output[0], '', array(), $encoding)."\n" : '';
+    $s = ! empty($this->recipe->outputHeaderRow) ? $this->csv_keys($output[0], '', [], $encoding)."\n" : '';
     foreach($output as $record) { $s .= $this->csv_values($record, '', $encoding)."\n"; }
     return $s;
   }
@@ -741,7 +741,7 @@ class jcomma {
     include_once('PHP_XLSXWriter/xlsxwriter.class.php');
     $x = new XLSXWriter();
     if (! empty($this->recipe->outputHeaderRow) && ! empty($output)) {
-      $x->writeSheetHeader('Sheet1', $this->xlsx_flattenkeys($output[0], array()));
+      $x->writeSheetHeader('Sheet1', $this->xlsx_flattenkeys($output[0], []));
     }
     foreach($output as $row) {
       $x->writeSheetRow('Sheet1', $this->xlsx_flatten($row));
@@ -752,7 +752,7 @@ class jcomma {
   }
 
   function xlsx_flatten($data){
-    $a = array();
+    $a = [];
     if (is_object($data)) { $data = (array)$data; }
     foreach($data as $k => $v) {
       if (is_object($v) || is_array($v)) {
@@ -765,7 +765,7 @@ class jcomma {
   }
 
   function xlsx_flattenkeys($data, $ks){
-    $a = array();
+    $a = [];
     if (is_object($data)) { $data = (array)$data; }
     foreach($data as $k => $v) {
       if (is_object($v) || is_array($v)) {
@@ -803,7 +803,7 @@ td { border: 1px solid black; padding: 2px; min-height: 18px; }
 EOD;
     if (! empty($this->recipe->outputHeaderRow)) {
       $s .= "<thead><tr>\n";
-      $s .= $this->html_keys($output[0], array());
+      $s .= $this->html_keys($output[0], []);
       $s .= "</tr></thead>\n";
     }
     $s .= "<tbody>\n";
@@ -865,7 +865,7 @@ EOD;
 
   function xmlify_attributes($record, $key){
     $s = "<{$key}";
-    $subordinates = array();
+    $subordinates = [];
     if (is_object($record)) { $record = (array)$record; }
     foreach($record as $k=>$v) {
       if (is_object($v)) {
