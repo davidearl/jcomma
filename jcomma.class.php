@@ -469,9 +469,9 @@ class jcomma {
             switch($comprising->item) {
             case 'column':
               $rowOffset = isset($comprising->rowOffset) ? $comprising->rowOffset : 0;
-              if (isset($rows[$rowOffset][$this->columnnumber($comprising->column)])) {
-                $inputvalue = $rows[$rowOffset][$this->columnnumber($comprising->column)];
-              }
+              $inputvalue = isset($rows[$rowOffset][$this->columnnumber($comprising->column)]) ?
+                          $rows[$rowOffset][$this->columnnumber($comprising->column)] :
+                          '';
               break;
             case 'text':
               $inputvalue = $comprising->text;
