@@ -366,6 +366,7 @@
 			<option value='replaceString' furtheroptions='cfieldoptioninputmatch,cfieldoptionoutput'>replace all occurences of string</option>
 			<option value='replaceRegExp' furtheroptions='cfieldoptioninputmatch,cfieldoptionoutput'>replace using regular expression:</option>
 			<option value='convertToNumber' furtheroptions='cfieldoptionconverterror,cfieldoptionnegate'>output as number</option>
+			<option value='convertToNumberSum' furtheroptions='cfieldoptionconverterror,cfieldoptionnegate'>output as sum of numbers</option>
 			<option value='convertToDate' furtheroptions='cfieldoptionconverterror,cfieldoptionconvertdateformat,cfieldoptionconverttime'>output as ISO date</option>
 			<option value='convertToCustomDate' furtheroptions='cfieldoptionconverterror,cfieldoptionconvertdateformat,cfieldoptionconvertdatestyle'>output as custom date</option>
 			<option value='skipIf' furtheroptions='cfieldoptiontest,cfieldoptioncondition'>skip next option if:</option>

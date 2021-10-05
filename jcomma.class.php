@@ -1,6 +1,6 @@
 <?php
 
-define ("CURRENT_VERSION", 5);
+define ("CURRENT_VERSION", 6);
 
 class jcomma {
 
@@ -241,7 +241,8 @@ class jcomma {
           $item = $this->checkstring(['records', $ir, 'fields', $if, 'options', $io, 'item'],
                                      ['ignoreCurrency','replaceRegExp','replaceString','trim',
                                       'bookkeepersNegative','skipIf','skipUnless','omitIf',
-                                      'convertToNumber','convertToDate', 'convertToCustomDate',
+                                      'convertToNumber','convertToNumberSum',
+                                      'convertToDate', 'convertToCustomDate',
                                       'errorOnValue']);
           switch($item) {
           case 'ignoreCurrency':
@@ -596,6 +597,21 @@ class jcomma {
               } else {
                 $outputvalue = (float)$outputvalue;
               }
+              if (! empty($option->negate)) { $outputvalue = - $outputvalue; }
+              break;
+            case 'convertToNumberSum':
+              $numbers = preg_split('~[ ,]+~', $outputvalue);
+              $total = 0;
+              foreach($numbers as $number){
+                if (! is_numeric($number)) {
+                  if (! empty($option->errorOnType)) {
+                    $this->oops("at row {$this->currentrow}, '{$number}' is not numeric (failed errorOnType check)");
+                  }
+                } else {
+                  $total += (float)$number;
+                }
+              }
+              $outputvalue = $total;
               if (! empty($option->negate)) { $outputvalue = - $outputvalue; }
               break;
             case 'convertToDate':
