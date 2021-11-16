@@ -5,16 +5,15 @@
 <title>jcomma: a CSV converter</title>
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,700,700i" rel="stylesheet">
 <link rel='stylesheet' href='jcomma.css?v=<?php echo filemtime('jcomma.css'); ?>'>
-<link rel='stylesheet' href='jquery-ui-1.12.1/jquery-ui.css'>
+<link rel='stylesheet' href='jquery-ui-1.13.0/jquery-ui.css'>
 <link rel='shortcut icon' href='logo.png'>
-<script src='jquery-3.1.0.min.js'></script>
-<script src='jquery-ui-1.12.1/jquery-ui.min.js'></script>
+<script src='jquery-3.6.0.min.js'></script>
+<script src='jquery-ui-1.13.0/jquery-ui.min.js'></script>
 <script src='jcomma.js?v=<?php echo filemtime('jcomma.js'); ?>'></script>
 </head>
 <body>
   <h1><img src='logo.svg' alt='logo'> jcomma: flexible conversion and sanitization of CSV and TSV files</h1>
   <a href="https://github.com/davidearl/jcomma"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
-  <p><span style='color: tomato; font-weight: bold;'>Beta testing!</span> This is work in progress.</p>
   <p>jcomma can be used:</p>
   <ul class='cbulleted'>
 	<li><a class='chelp' href='help.php?a=husewebapp'>manually</a>, from here or another installation</li>
@@ -211,7 +210,7 @@
   	<div class='csection coptions clevel1'>
 	  <label class='clabelheader'>Output records</label>
 	    <a class='chelp cinfo' href='help.php?a=hrecords'></a>
-        (you'll need at least one, but you can make more than one record from each row of the CSV)<br>
+        (you&apos;ll need at least one, but you can make more than one record from each row of the CSV)<br>
 	  <ul class='clist'></ul>
 	  <button id='iaddrecord' class='cadd' proforma='irecordproforma'>+</button> <span class='canother'>another record</span>
 	</div>
@@ -236,12 +235,15 @@
 			<option value='nomatch' furtheroptions='cignorerowsvalue'>does not match regular expression</option>
 			<option value='eq' furtheroptions='cignorerowsvalue'>equal to</option>
 			<option value='ne' furtheroptions='cignorerowsvalue'>not equal to</option>
-            <option value='ge' furtheroptions='cignorerowsvalue'>greater or equal to:</option>
-            <option value='le' furtheroptions='cignorerowsvalue'>less or equal to:</option>
-            <option value='before' furtheroptions='cignorerowsvalue'>before (date):</option>
-            <option value='after' furtheroptions='cignorerowsvalue'>after (date):</option>
+			<option value='ge' furtheroptions='cignorerowsvalue'>greater or equal to:</option>
+			<option value='le' furtheroptions='cignorerowsvalue'>less or equal to:</option>
+			<option value='before' furtheroptions='cignorerowsvalue'>before (date):</option>
+			<option value='after' furtheroptions='cignorerowsvalue'>after (date):</option>
+			<option value='eqprev' furtheroptions='cignorerowsvaluecolumn'>equal to column in previous row:</option>
+			<option value='neprev' furtheroptions='cignorerowsvaluecolumn'>not equal to column in previous row:</option>
 		  </select>
 		  <input type='text' class='cignorerowsvalue cinitiallyhidden cfurtheroption cinput cinput2' name='value' placeholder='value to compare with'>
+		  <input type='text' class='cignorerowsvaluecolumn cinitiallyhidden cfurtheroption cinput cinput2' name='prevcolumn' placeholder='column letter/header'>
 		  <a class='chelp cinfo' href='help.php?a=hconditions'></a>
 		</div>
 	  </div>
@@ -307,8 +309,11 @@
 		  <option value='le' furtheroptions='crecordifvalue'>less or equal to</option>
           <option value='before' furtheroptions='crecordifvalue'>before (date):</option>
           <option value='after' furtheroptions='crecordifvalue'>after (date):</option>
+		  <option value='eqprev' furtheroptions='crecordifvaluecolumn'>equal to column in previous row:</option>
+		  <option value='neprev' furtheroptions='crecordifvaluecolumn'>not equal to column in previous row:</option>
 		</select>
-		<input type='text' class='crecordifvalue cinitiallyhidden cfurtheroption cinput cinput3' name='value' placeholder='value to compare with'> <a class='chelp cinfo' href='help.php?a=hconditions'></a>
+		<input type='text' class='crecordifvalue cinitiallyhidden cfurtheroption cinput cinput3' name='value' placeholder='value to compare with'>
+		<input type='text' class='crecordifvaluecolumn cinitiallyhidden cfurtheroption cinput cinput3' name='prevcolumn' placeholder='column letter/header'> <a class='chelp cinfo' href='help.php?a=hconditions'></a>
 	  </div>
 	</li>
 
@@ -372,6 +377,7 @@
 			<option value='skipIf' furtheroptions='cfieldoptiontest,cfieldoptioncondition'>skip next option if:</option>
 			<option value='skipUnless' furtheroptions='cfieldoptiontest,cfieldoptioncondition'>skip next option unless:</option>
 			<option value='omitIf' furtheroptions='cfieldoptiontest,cfieldoptioncondition'>omit field if:</option>
+			<option value='carryOverIf' furtheroptions='cfieldoptiontest,cfieldoptioncondition'>carry over from previous record instead if:</option>
 			<option value='errorOnValue' furtheroptions='cfieldoptiontest,cfieldoptioncondition'>stop with error if value: </option>
 		  </select>
 		  <input type='text' class='cfieldoptioncurrencies cinitiallyhidden cfurtheroption cinput cinput4' name='currencies' value='&pound;&dollar;&yen;&euro;,' placeholder='list of currency symbols'>
@@ -398,8 +404,11 @@
 			  <option value='le' furtheroptions='cfieldoptionvalue'>less or equal to</option>
               <option value='before' furtheroptions='cfieldoptionvalue'>is before (date):</option>
               <option value='after' furtheroptions='cfieldoptionvalue'>is after (date):</option>
+			  <option value='eqprev' furtheroptions='cfieldoptionvaluecolumn'>equal to column in previous row:</option>
+			  <option value='neprev' furtheroptions='cfieldoptionvaluecolumn'>not equal to column in previous row:</option>
 			</select> 
 			<input type='text' class='cfieldoptionvalue cinitiallyhidden cfurtheroption cinput cinput4' name='value' value='' placeholder='compared with'>
+			<input type='text' class='cfieldoptionvaluecolumn cinitiallyhidden cfurtheroption cinput cinput4' name='prevcolumn' value='' placeholder='column letter/header'>
 		  </span>
 		  <input type='text' class='cfieldoptionconvertdatestyle cinitiallyhidden cfurtheroption cinput cinput4' name='dateFormatStyle' value='' placeholder='date style'>
 		  <span class='cfieldoptionconverterror cinitiallyhidden cfurtheroption'>
@@ -425,7 +434,9 @@
 		<select class='cfieldoptionitem cinput cinput4' name='item'>
 		  <option value=''>choose&hellip;</option>
 		  <option value='column' furtheroptions='cfieldcomprisingcolumn,cfieldappend'>column (letter or header):</option>
+		  <option value='previouscolumn' furtheroptions='cfieldcomprisingcolumn,cfieldappend'>column in previous row:</option>
 		  <option value='field' furtheroptions='cfieldcomprisingfield,cfieldappend'>earlier field (in this record):</option>
+		  <option value='previousfield' furtheroptions='cfieldcomprisingfield,cfieldappend'>field in previous record:</option>
 		  <option value='text' furtheroptions='cfieldcomprisingtext'>verbatim text:</option>
 		</select>
 		<span class='cinitiallyhidden cfurtheroption cfieldcomprisingcolumn'>

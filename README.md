@@ -312,9 +312,15 @@ Concatenate several columns, interleaved with verbatim separators, to make one o
 
 Where there is more than one input row ([rowCount](#hrowcount) is greater than 1), you'll need to say from which of those rows the CSV cell is obtained (this also allows you to concatenate several values vertically from the same column), by giving the row offset (0 for the first row, 1 for the second in each group of rows, and  so on).
 
-You can also include verbatim text, for example to parenthesis a second column. (`"comprising": [{"item": "text", "text": "whatever text"}, ...]` [in the recipe](#hrecipe)).
+You can also include:
 
-You can also include another field as a source for this field. However, it must be a field defined earlier in the record: fields are computed in order, so later fields are not available at this point. (`"comprising": [{"item": "field", "field": "name", ...}, ...]` [in the recipe](#hrecipe)).
+* verbatim text, for example to parenthesis a second column. (`"comprising": [{"item": "text", "text": "whatever text"}, ...]` [in the recipe](#hrecipe)).
+
+* another field as a source for this field. However, it must be a field defined earlier in the record: fields are computed in order, so later fields are not available at this point. (`"comprising": [{"item": "field", "field": "name", ...}, ...]` [in the recipe](#hrecipe)).
+
+* the value of a column from the previous row rather than the current row being processed.
+ 
+* the value of a field from the previous record output.
 
 For fields and columns, check boxes are available to:
 
@@ -340,11 +346,11 @@ Available options are as follows:
 
 * ***trim surrounding white space*** (`"item": "trim"` [in the recipe](#hrecipe)): remove all preceding and trailing spaces, newlines, line-feeds and tabs from the value, any number in any mixture. Example: "&nbsp;&nbsp;123.45&nbsp;&nbsp;" &rarr; "123.45"
 
-* ***replace all occurences of string*** (`"item": "replaceString", "matches": "string", "output": "replacement"` [in the recipe](#hrecipe)): Replaces all occurences in value of the guiven string with its replacement. For example, if value is "the cats scattered" match is "cat" and  replacement is "dog", the result is "the dogs sdogtered"!
+* ***replace all occurences of string*** (`"item": "replaceString", "matches": "string", "output": "replacement"` [in the recipe](#hrecipe)): Replaces all occurences in value of the given string with its replacement. For example, if value is "the cats scattered" match is "cat" and  replacement is "dog", the result is "the dogs sdogtered"!
 
 * ***replace using regular expression*** (`"item": "transform", "matches": "regexp", "output": "replacement"` [in the recipe](#hrecipe)): If the field matches the provided [regular expression](#hregularexpression) then it is replaced by the provided replacement. Fragments matched can be substituted using $1, $2 etc for parenthesised elements in the regular expression. Example: if the value is "the cat sat on the mat", the regular expression "/ c?t /" and the replacement " dog ", we end up with "the dog sat on the mat".
 
-* ***output as number*** (`"item": "convertToNumber", "errorOnType": true, "negate": true` [in the recipe](#hrecipe)): Converts the value to a number in the output, so that you can do artihmetic on it in the output for example (it is also then amenable to the greater and less options in subsequent tests here). If the string value cannot be converted ("12a" for example), then the whole CSV conversion is stopped with an appropriate error message if the ***stop on conversion*** box is checked, or output as 0 (zero) otherwise. If the ***negate after conversion*** box is checked, the result is the negative of the converted number. For example the debit column of a bank statement may need to produce the negative of the cell contents if being combined with a credit column.
+* ***output as number*** (`"item": "convertToNumber", "errorOnType": true, "negate": true` [in the recipe](#hrecipe)): Converts the value to a number in the output, so that you can do artihmetic on it in the output for example (it is also then amenable to the greater and less options in subsequent tests here). If the string value cannot be converted ("12a" for example), then the whole CSV conversion is stopped with an appropriate error message if the ***stop on conversion*** box is checked, or output as 0 (zero) otherwise. If the ***negate after conversion*** box is checked, the result is the negative of the converted number. For example the debit column of a bank statement may need to produce the negative of the cell contents if being combined with a credit column. Note that if the field is comprised from some column concatenated with the corresponding field in the previous record, you can sum columns from multiple rows.
 
 * ***output as sum of numbers*** (`"item": "convertToNumberSum", "errorOnType": true, "negate": true` [in the recipe](#hrecipe)): Converts the value to a number in the output, formed from the sum of multiple numbers in the field. For example, the field might be the space-separated concatenation of two number columns of the input which you wish to add. The numbers forming the sum are separated with any combination of spaces and commas. You can then do artihmetic on it in the output for example (it is also then amenable to the greater and less options in subsequent tests here). If the string value cannot be converted ("123 12a" for example), then the whole CSV conversion is stopped with an appropriate error message if the ***stop on conversion*** box is checked, or not included in the sum otherwise. If the ***negate after conversion*** box is checked, the result is the negative of the resultng number.
 
@@ -353,6 +359,8 @@ Available options are as follows:
 * ***output as custom date*** (`"item": "convertToCustomDate", "errorOnType": true, "dateFormatUS": true, "dateFormatStyle": "j M Y"` [in the recipe](#hrecipe)): Similar to ISO date, but you can specify the output style yourself (including time parts). This uses the [PHP date function](http://php.net/manual/en/function.date.php) in which letters in the date style are replaced by parts of the date or time. For example "M j, Y" produces dates like "Dec 1, 2016" because M means the abbreviated month name, j means the day without leading zeros and Y means the four digit year. Many other variants are possible - see [date](http://php.net/manual/en/function.date.php).
 
 * ***omit field if...*** (`"item": "omitIf", "condition": "...", ...` [in the recipe](#hrecipe)): Having transformed the field by whatever other methods, the field is discarded if the [condition](#hcondition) selected here is satisifed. Omiting a field is potentially useful in JSON and XML formats, but in tabular formats (CSV, HTML, XLSX) this would result in columns shifting left by one, so it would be better to transform (above) to an empty string value instead. Note that when a field is omitted, no further options are applied for it and the field is not available to later fields for comparison etc.
+
+* ***carry over from previous record instead if...*** (`"item": "carryOverIf", "condition": "...", ...` [in the recipe](#hrecipe)): if the [condition](#hcondition) selected here is satisifed, the value already concatenated and transformed by previous options is completely discarded and replaced with the value from the same field in the previous corresponding record (whether or not that record was actually output). In conjunction with conditions on whether to output the record, this can be used to combine values from different rows into a single record.
 
 * ***skip next option if...*** and ***skip next option unless...*** (`"item": "skipIf", "condition": "...", ...` or `"item": "Unless", "condition": "...", ...` [in the recipe](#hrecipe)): The following option can be applied or not depending on the outcome of this [condition](#hcondition).
 
@@ -384,6 +392,8 @@ Having calculated all the fields for a record, the values computed can be used t
 * ***less or equal to*** (`"condition": "le", "value": 123` [in the recipe](#hrecipe)): <= - numerically, as for 'greater or equal to'.
 * ***before (date)*** (`"condition": "before", "value": "2016-09-23"` [in the recipe](#hrecipe)): date comparison - both the date entered and the date being compared must not contain '/', that is must not be ambiguous. In the case of fields, you can always convert to ISO and then convert to another format after comparison, but ignoring rows is only possible for non-ambiguous dates.
 * ***after (date)*** (`"condition": "after", "value": "2016-09-23"` [in the recipe](#hrecipe)): date comparison, as "before".
+* ***equal to column in previous row*** (`"condition": "eqprev", "prevcolumn": "letter/header"`): the condition is met if the value being compared is equal to the column identified by its column letter or heading in the _previous_ row.
+* ***not equal to column in previous row*** (`"condition": "neprev", "prevcolumn": "letter/header"`): the condition is met if the value being compared is different from the column identified by its column letter or heading in the _previous_ row.
 
 (#hregularexpression)
 ### Regular expressions

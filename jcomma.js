@@ -241,7 +241,7 @@ $(function(){
 	function makerecipe(){
 		/* capture the form content and return as a JSON string (we may save this to a file or localStorage) */
 		var data = recurse(1, $("#iform .coptions"));
-		data.recipeVersion = 6;
+		data.recipeVersion = 7;
 		return JSON.stringify(data);
 	}
 
