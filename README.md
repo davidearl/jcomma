@@ -1,8 +1,8 @@
-# ![logo](https://jcomma.savesnine.info/logo.svg) jcomma: help
+# ![logo](https://jcomma.davidearl.uk/logo.svg) jcomma: help
 
 jcomma converts CSV (and TSV) files to other formats and sanitizes them so that they are not subject to the vagaries of the generator of the CSV.
 
-**Live version at [https://jcomma.savesnine.info](https://jcomma.savesnine.info)**
+**Live version at [https://jcomma.davidearl.uk](https://jcomma.davidearl.uk)**
 
 CSV is a truly terrible format for data interchange, especially internationally. Yet, it is still ubiquitous in all sorts of scenarios, and it is popular because it is fairly easy for non-programmers to understand (partly because it glosses over the problems!) so we often have to deal with such files when we'd rather not.
 
@@ -29,7 +29,7 @@ Fill in the form and click **Do It!**. Each reload of the page remembers the rec
 
 If you give a URL to a recipe on the web, jcomma will load that rather than the most recently used. For example:
 
-    https://jcomma.savesnine.info/?recipe=https%3A%2F%2Fexample.com%2Fsome_recipe.json  
+    https://jcomma.davidearl.uk/?recipe=https%3A%2F%2Fexample.com%2Fsome_recipe.json  
 
 which means you can share a recipe efficiently. (If you put it in Google Drive or Dropbox, we'll convert the link they give you when you share the file to one which is directly download-able). Don't forget that the second URL must be percent-encoded when used as a parameter in the main URL (you can do that most easily by loading it in the box provided and then copying the URL)
 
@@ -43,7 +43,7 @@ Either:
  
 For example:
 
-    curl -F "recipe=@recipe.json" -F "csv=@my.csv" "https://jcomma.savesnine.info/jcomma.php"
+    curl -F "recipe=@recipe.json" -F "csv=@my.csv" "https://jcomma.davidearl.uk/jcomma.php"
 
 You can use the web app to make a recipe file, save it, and then use that programatically; or make one on the fly.
 
