@@ -5,10 +5,11 @@
 <title>jcomma: a CSV converter</title>
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,700,700i" rel="stylesheet">
 <link rel='stylesheet' href='jcomma.css?v=<?php echo filemtime('jcomma.css'); ?>'>
-<link rel='stylesheet' href='jquery-ui-1.13.0/jquery-ui.css'>
+<link rel='stylesheet' href='vendor/components/jqueryui/themes/base/jquery-ui.min.css'>
+<link rel='stylesheet' href='jquery-ui/jquery-ui-theme.min.css'>
 <link rel='shortcut icon' href='logo.png'>
-<script src='jquery-3.6.0.min.js'></script>
-<script src='jquery-ui-1.13.0/jquery-ui.min.js'></script>
+<script src='vendor/components/jquery/jquery.min.js'></script>
+<script src='vendor/components/jqueryui/jquery-ui.min.js'></script>
 <script src='jcomma.js?v=<?php echo filemtime('jcomma.js'); ?>'></script>
 </head>
 <body>

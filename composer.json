@@ -12,7 +12,9 @@
 	],
 	"require": {
 		"php": ">=5.4",
-		"mk-j/php_xlsxwriter": "0.38"
+		"mk-j/php_xlsxwriter": "0.38",
+		"components/jquery": "3.6.0",
+		"components/jqueryui": "1.12.1"
 	},
 	"autoload": {
 		"psr-4": {

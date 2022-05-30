@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,700,700i" rel="stylesheet">
 <link rel='stylesheet' href='jcomma.css'>
 <link rel='shortcut icon' href='/logo.png'>
-<script src='/jquery-3.6.0.min.js'></script>
+<script src='vendor/components/jquery/jquery.min.js'></script>
 <style>
 ul {
 	list-style: disc;
