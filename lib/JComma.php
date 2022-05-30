@@ -900,7 +900,6 @@ class JComma {
         $a[$k] = $type;
       }
     }
-    error_log(print_r($a,1));
     return $a;
   }
   
