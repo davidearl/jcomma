@@ -1,8 +1,10 @@
 <?php
 
+namespace DavidEarl\JComma;
+
 define ("CURRENT_VERSION", 7);
 
-class jcomma {
+class JComma {
 
   function __construct($path_or_filedescriptor, $recipe) {
     if (is_string($path_or_filedescriptor)) {
@@ -19,7 +21,7 @@ class jcomma {
   
   static function oops($s) {
     debug_print_backtrace();
-    throw new Exception($s);
+    throw new \Exception($s);
   }  
 
   function columnletter($n) {
@@ -155,17 +157,17 @@ class jcomma {
         }
         if (! isset($o[$f])) {
           if (is_null($default)) { $this->describefield($field, 'is missing'); return NULL; }
-          $o[$f] = $last ? $default : (gettype($field[$i+1] == 'integer') ? [] : new stdClass());
+          $o[$f] = $last ? $default : (gettype($field[$i+1] == 'integer') ? [] : new \stdClass());
         }
         $o = $o[$f];
       } else {
         if (! is_object($o)) {
           $this->errors[] = $this->describefield($field, '- object expected');
-          $o = new stdClass();
+          $o = new \stdClass();
         }
         if (! isset($o->$f)) {
           if (is_null($default)) { $this->errors[] = $this->describefield($field, 'is missing'); }
-          $o->$f = $last ? $default : (gettype($field[$i+1] == 'integer') ? [] : new stdClass());
+          $o->$f = $last ? $default : (gettype($field[$i+1] == 'integer') ? [] : new \stdClass());
         }
         $o = $o->$f;
       }
@@ -463,7 +465,7 @@ class jcomma {
         $this->oops("for field name '{$name}' array subscript needs to be preceded by a name");
       } else {
         if (is_null($o)) {
-          $o = new stdClass();
+          $o = new \stdClass();
         } else if (isset($o->{$parts[$i]}) && is_array($o->{$parts[$i]})) {
           $this->oops("for field name '{$name}' array/object structure is inconsistent with an earlier one");
         }
@@ -520,7 +522,7 @@ class jcomma {
       /* produce each record required from this group of fields */
       foreach($this->recipe->records as $idxRecord => $record) {
 
-        $outputrecord = new stdClass();
+        $outputrecord = new \stdClass();
         $excludefields = [];
         
         foreach ($record->fields as $field) {
@@ -854,8 +856,7 @@ class jcomma {
   }
   
   function outputxlsx($output) {
-    include_once('PHP_XLSXWriter/xlsxwriter.class.php');
-    $x = new XLSXWriter();
+    $x = new \XLSXWriter();
     if (! empty($this->recipe->outputHeaderRow) && ! empty($output)) {
       $x->writeSheetHeader('Sheet1', $this->xlsx_flattenkeys($output[0], []));
     }
@@ -890,13 +891,16 @@ class jcomma {
         $type = gettype($v);
         $k1 = $this->flattenkeys($ks,$k);
         if ($type == 'string' && isset($this->outputtypes[$k1])) { $type = $this->outputtypes[$k1]; }
+        if ($type == 'double' || $type == 'float') { $type = '0.00'; }
         $a[$k1] = $type;
       } else {
         $type = gettype($v);
         if ($type == 'string' && isset($this->outputtypes[$k])) { $type = $this->outputtypes[$k]; }
+        if ($type == 'double' || $type == 'float') { $type = '0.00'; }
         $a[$k] = $type;
       }
     }
+    error_log(print_r($a,1));
     return $a;
   }
   
@@ -992,7 +996,7 @@ EOD;
             $va->_index = $i;
             $subordinates[$k][] = $va;
           } else {
-            $vaa = new stdClass();
+            $vaa = new \stdClass();
             $vaa->_index = $i;
             $vaa->_value = $va;
             $subordinates[$k][] = $vaa;

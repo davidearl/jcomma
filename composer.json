@@ -1,0 +1,23 @@
+{
+	"name": "davidearl/jcomma",
+    "description": "convert CSV files to a consistent format",
+	"keywords": ["csv","tsv"],
+	"homepage": "https://jcomma.davidearl.uk",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "David Earl",
+			"homepage": "https://www.frankieandshadow.com"
+		}
+	],
+	"require": {
+		"php": ">=5.4",
+		"mk-j/php_xlsxwriter": "0.38"
+	},
+	"autoload": {
+		"psr-4": {
+			"DavidEarl\\JComma\\": "lib"
+		}
+	}
+	
+}

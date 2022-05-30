@@ -19,7 +19,7 @@ $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $recipe);
 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-curl_setopt($ch, CURLOPT_USERAGENT, 'jcomma 3.0 (https://jcomma.savesnine.info)');
+curl_setopt($ch, CURLOPT_USERAGENT, 'jcomma 3.0 (https://jcomma.davidearl.uk)');
 $r = curl_exec($ch);
 if ($r === FALSE) { header("HTTP/1.1 404 Not Found"); die('cannot fetch recipe from URL'); }
 $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);

@@ -50,13 +50,13 @@ You can use the web app to make a recipe file, save it, and then use that progra
 (#huselibrary)
 ### As a library
 
-To use as a library include jcomma.class.php in your PHP application, and use like this:
+To use as a library when installed with composer, include `vendor/autoload.php`, or otherwise include `lib/JComma.php` in your PHP application, and use like this:
 
-    $j = new jcomma($pathtocsv, $recipeobject /* not JSON: already decoded */);
+    $j = new \DavidEarl\JComma\JComma($pathtocsv, $recipeobject /* not JSON: already decoded */);
     $errors = $j->validate(); // produces array of error message strings, or empty array if recipe is OK
     if (empty($errors)) {
         $result = $j->convert(); // produces array of objects
-        $jcomma->output($result, $filename, $cl); /* optional: if you want to actually emit a file or string */
+        $j->output($result, $filename, $cl); /* optional: if you want to actually emit a file or string */
     }
 
 $recipe->outputTo can be set to 'string' (unlike when used via the API), when it is converted to the output format but returned as a string rather than emitted to stdout. $cl=TRUE ("command line") is optional, and omits all headers
@@ -496,7 +496,13 @@ When used from the [API](#huseapi), as a [library](#huselibrary), or in a [shell
 
 Requires PHP >= 5.4. Does not work on older browsers (it's using a recent version of jQuery). It will probably work on PHP 5.3 except for JSON Pretty Print which would produce a warning in the server error log if used.
 
-Just put the files in the document root of your web server, ideally a https website, or as a sub-directory of a website.
+Put the files in the document root of your web server, ideally a https website, or as a sub-directory of a website.
+
+cd to top level and run composer to generate autoload and install dependencies:
+
+    composer update
+    
+If you can't use composer, include `lib/JComma.php` in your project. You will need composer to create the website.
 
 You might want to increase the individual file and total file upload limits in your server settings from the PHP default.
 

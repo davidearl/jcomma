@@ -2,7 +2,7 @@
 
 ini_set('default_charset', 'utf-8');
 
-include_once('jcomma.class.php');
+include_once(__DIR__.'/vendor/autoload.php');
 
 function oops($s) { throw new Exception($s); }
 
@@ -56,7 +56,7 @@ try {
 
   }
   
-  $jcomma = new jcomma($path, $recipe);
+  $jcomma = new \DavidEarl\JComma\JComma($path, $recipe);
   $errors = $jcomma->validate();
   if (! empty($errors)) { oops(implode("\n", $errors)); }
 

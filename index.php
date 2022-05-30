@@ -27,8 +27,7 @@
   <p style='max-width: 800px;'>This page lets you prepare a recipe which tells jcomma how to
   interpret CSV files laid out in a particular way, e.g. by a bank's
   statement download. You can then apply the same recipe repeatedly to
-  the same kinds of file. (No data is retained on the server; 
-  the only cookies are for Google Analytics site use statistics).
+  the same kinds of file. (No data is retained on the server; no cookies are used).
   </p>
   
   <hr>
@@ -478,13 +477,5 @@
 
   <div id='imessage' style='display: none;'><p></p></div>
 
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-48557704-2', 'auto');
-  ga('send', 'pageview');
-</script>
 </body>
 </html>
