@@ -31,7 +31,7 @@ class JComma {
   static $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   
   static function oops($s) {
-    debug_print_backtrace();
+    error_log(print_r(debug_backtrace(),1));
     throw new \Exception($s);
   }  
 
