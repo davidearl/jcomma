@@ -6,6 +6,17 @@ define ("CURRENT_VERSION", 7);
 
 class JComma {
 
+  private $fd;
+  private $path;
+  private $recipe;
+  private $currentrow;
+  private $errors;
+  private $encoding;
+  private $headings;
+  private $outputtypes;
+  private $cl;
+  private $elementname;
+  
   function __construct($path_or_filedescriptor, $recipe) {
     if (is_string($path_or_filedescriptor)) {
       $this->path = $path_or_filedescriptor;
