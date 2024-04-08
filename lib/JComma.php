@@ -497,23 +497,27 @@ class JComma {
       return ! isset($test->prevcolumn) ? '' : $test->prevcolumn;
     }
   }
+
+  function checkBOM(){
+    /* check for BOM (byte order mark, which indicates UTF-8 content), skip if present and set to utf-8 */
+    $bom = fgets($this->fd, 4);
+    if ($bom === FALSE) { self::oops('nothing useful in file'); }
+    if (strlen($bom) != 3 || substr($bom, 0, 3) != "\xef\xbb\xbf") {
+      rewind($this->fd);
+    } else if ($this->encoding == 'auto') {
+      $this->encoding = 'UTF-8';
+    }
+  }
   
   function convert() {
     if (! empty($this->path)) { $this->fd = fopen($this->path, 'r'); }
     if ($this->fd === FALSE) { self::oops("cannot open csv file"); }
-
+    $this->checkBOM();
+    
     $this->headings = NULL;
     if ($this->recipe->headerRows > 0) {
       $rows = $this->readrows($this->recipe->headerRows, NULL, TRUE /* exactly that number, don't ignore any rows */);
       if (empty($rows)) { self::oops('nothing useful in file except possibly headers'); }
-      /* there may be a byte order mark, and fgetcsv seems to ignore this */
-      if (count($rows[0]) > 0 && substr($rows[0][0], 0, 3) == "\xef\xbb\xbf" /* BOM */) {
-        $rows[0][0] = substr($rows[0][0], 3);
-        /* and it may also have left quotes because of this... */
-        if (strlen($rows[0][0]) >=2 && $rows[0][0][0] == '"') {
-          $rows[0][0] = str_replace('""', '"', substr($rows[0][0], 1, strlen($rows[0][0])-2));
-        }
-      }
       for ($i = 0; $i < count($rows[$this->recipe->headerRows-1]); $i++) {
         $this->headings[strtoupper($rows[$this->recipe->headerRows-1][$i])] = $this->columnletter($i);
       }
