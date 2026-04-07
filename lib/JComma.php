@@ -406,12 +406,18 @@ class JComma {
     }
     return $row;
   }
-  
+
+  static function jgetcsv($fd, $length=NULL, $separator = ",", $enclosure = "\"", $escape='') {
+    /* provides backward copmpatibility from PHP8.2, but with PHP8.4 value of escape:
+       later versions change escape so require it explicitly */
+       return fgetcsv($fd, $length, $separator, $enclosure, $escape);
+  }
+
   function readrows($rowCount, $previousrows, $exact=FALSE){
     $rows = [];
     for($i = 0; $i < $rowCount; $i++) {
-      $row = fgetcsv($this->fd, NULL,
-                     $this->recipe->delimiterChar, $this->recipe->enclosureChar);
+      $row = self::jgetcsv($this->fd, NULL,
+                           $this->recipe->delimiterChar, $this->recipe->enclosureChar);
       $this->currentrow++;
       if ($row === FALSE) { return FALSE; }
       if (! $exact) {
@@ -419,8 +425,8 @@ class JComma {
         if (! empty($this->recipe->combineRows)) {
           for(;;) {
             $fp = ftell($this->fd); /* for when we don't combine */
-            $nextRow = fgetcsv($this->fd, NULL,
-                               $this->recipe->delimiterChar, $this->recipe->enclosureChar);
+            $nextRow = self::jgetcsv($this->fd, NULL,
+                                     $this->recipe->delimiterChar, $this->recipe->enclosureChar);
             if ($nextRow === FALSE) { break; }
             foreach($this->recipe->combineRows as $combineRow) {
               $nc = $this->columnnumber($combineRow->name);
